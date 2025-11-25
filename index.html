@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>融合新闻专题（模板2：液态玻璃版）</title>
+  <meta name="description" content="结合视频、图文与数据的融合新闻专题 - 模板2：报告式专题 + 互动单页" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = {theme: {extend: {}}}</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* --- 0. 主题 (深海军蓝) --- */
+    body { 
+        font-family: ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial; 
+        background: #1e293b; /* 深海军蓝背景 */
+        color: #f3f4f6; /* 默认文字颜色 */
+        min-height: 100vh;
+    }
+    
+    /* 强制所有默认文字颜色在深色背景下保持亮色，用于覆盖 Tailwind 的 text-gray-* */
+    .text-gray-900, .text-gray-700, .text-gray-600, .text-gray-500 {
+         color: #d1d5db !important; 
+    }
+
+    /* --- 1. 液态形状动画 --- */
+    @keyframes liquid-breathing {
+        0% { border-radius: 20px 20px 20px 20px; }
+        33% { border-radius: 30px 50px 25px 50px; } 
+        66% { border-radius: 50px 25px 50px 30px; } 
+        100% { border-radius: 20px 20px 20px 20px; }
+    }
+
+    /* --- 2. 动/静态玻璃卡片定义 (带流畅顺滑的突出悬停效果) --- */
+    
+    .glass-base {
+        backdrop-filter: blur(15px);         
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 16px; 
+        /* 核心：流畅顺滑的过渡，用于所有卡片，时长 0.5s */
+        transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); 
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* 液态玻璃卡片 (会流动) */
+    .liquid-card {
+        background: rgba(255, 255, 255, 0.15); 
+        border: 1px solid rgba(255, 255, 255, 0.4); /* <--- 恢复白边 */
+        animation: liquid-breathing 8s ease-in-out infinite;
+    }
+    .liquid-card:hover {
+        animation-play-state: paused;
+        /* 增强突出效果 */
+        transform: translateY(-6px) scale(1.03); 
+        border-radius: 16px; 
+        /* 增强阴影：亮色发光 + 浮空阴影 */
+        box-shadow: 
+            0 0 30px rgba(255, 255, 255, 0.4), 
+            0 20px 40px rgba(0, 0, 0, 0.4);    
+    }
+
+    /* 静态玻璃卡片 (不会流动) */
+    .static-glass {
+        background: rgba(255, 255, 255, 0.15); 
+        border: 1px solid rgba(255, 255, 255, 0.4); /* <--- 恢复白边 */
+        border-radius: 12px;
+    }
+    .static-glass:hover {
+        /* 增强突出效果 */
+        transform: translateY(-4px); 
+        /* 增强阴影 */
+        box-shadow: 
+            0 0 20px rgba(255, 255, 255, 0.3), 
+            0 16px 35px rgba(0, 0, 0, 0.35); 
+    }
+    
+    /* 导航栏和页脚使用深色玻璃 */
+    .dark-glass {
+        background: rgba(30, 41, 59, 0.8); 
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.5s ease;
+    }
+    
+    nav a {
+        color: #f3f4f6; 
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5); 
+    }
+    
+    /* 优化点：让按钮/小链接的过渡更敏捷（保持 0.3s） */
+    a.static-glass, 
+    button.static-glass,
+    .vote.static-glass {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important; 
+    }
+    
+    /* 优化点：调整按钮悬停效果，更突出 */
+    a.static-glass:hover, button.static-glass:hover, .vote.static-glass:hover {
+        transform: translateY(-2px); 
+        /* 增强发光效果 */
+        box-shadow: 
+            0 0 15px rgba(255, 255, 255, 0.4), /* Brighter white glow */
+            0 8px 15px rgba(0, 0, 0, 0.3); /* Stronger lift shadow */
+    }
+
+    /* 其他通用样式 */
+    .video-thumb { aspect-ratio:16/9; object-fit:cover }
+    .report-section { scroll-margin-top:90px }
+  </style>
+</head>
+<body class="text-gray-900">
+
+  <header class="dark-glass sticky top-0 z-40 border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="#" class="text-2xl font-semibold text-white">融合新闻</a>
+        <nav class="hidden md:flex gap-3 text-sm">
+          <a href="#hero" class="hover:underline">首页</a>
+          <a href="#overview" class="hover:underline">概览</a>
+          <a href="#videos" class="hover:underline">视频</a>
+          <a href="#chain" class="hover:underline">逻辑链条</a>
+          <a href="#report" class="hover:underline">专题章节</a>
+          <a href="#data" class="hover:underline">数据</a>
+          <a href="#members" class="hover:underline">小组成员</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="#" class="px-3 py-1 border rounded text-sm static-glass text-white">下载资料</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+
+    <section id="hero" class="grid md:grid-cols-3 gap-6 items-start">
+      <div class="md:col-span-2">
+        <div class="rounded-2xl p-8 glass-base liquid-card shadow-lg">
+          <h1 class="text-3xl md:text-4xl font-bold text-white">城市出行与电动车治理 · 深度专题</h1>
+          <p class="mt-4 text-gray-700">本专题结合短视频采访、图文报道与数据可视化，呈现广州市电动车上牌与治理的多维面向。点击下方进入各章节或浏览我们的多媒体作品。</p>
+          <div class="mt-6 flex gap-3">
+            <a href="#report" class="px-4 py-2 bg-gray-900 text-white rounded-lg shadow-sm static-glass">阅读专题章节</a>
+            <a href="#videos" class="px-4 py-2 border rounded-lg static-glass text-white">观看视频</a>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-2xl overflow-hidden shadow-sm glass-base liquid-card" style="animation-duration: 10s;">
+          <img id="coverImg" src="https://picsum.photos/1200/600?random=101" alt="专题长图" class="w-full object-cover max-h-[56vh] opacity-80" />
+        </div>
+
+        <div class="mt-6 grid sm:grid-cols-3 gap-4">
+          <a href="#chain" class="block rounded-xl p-4 shadow-sm glass-base liquid-card" style="animation-delay: -1s;">
+            <div class="font-semibold text-white">逻辑链条</div>
+            <div class="text-sm text-gray-500 mt-2">逐步拆解报道逻辑与证据链</div>
+          </a>
+          <a href="#data" class="block rounded-xl p-4 shadow-sm glass-base liquid-card" style="animation-delay: -2s;">
+            <div class="font-semibold text-white">数据新闻</div>
+            <div class="text-sm text-gray-500 mt-2">可视化与数据下载</div>
+          </a>
+          <a href="#videos" class="block rounded-xl p-4 shadow-sm glass-base liquid-card" style="animation-delay: -3s;">
+            <div class="font-semibold text-white">短视频</div>
+            <div class="text-sm text-gray-500 mt-2">采访与纪录</div>
+          </a>
+        </div>
+
+        <div id="overview" class="mt-8 p-6 glass-base liquid-card rounded-2xl">
+          <h2 class="text-2xl font-semibold mb-4 text-white">导读 / 摘要</h2>
+          <p class="text-gray-700">（在此处放置 150-300 字的导读，概述研究问题、方法与关键发现。建议明确数据时间范围与主要结论。）</p>
+        </div>
+
+      </div>
+
+      <aside class="space-y-4">
+        <div class="rounded-2xl p-4 shadow-sm glass-base static-glass">
+          <h4 class="font-semibold text-white">小组分工</h4>
+          <ul class="mt-3 text-sm text-gray-700 space-y-2">
+            <li>京若琛：脚本及解说词 · 图表制作</li>
+            <li>车文恒：摄影摄像 · 数据分析</li>
+            <li>李盈：剪辑 · 文字撰稿</li>
+            <li>李思欣：采访 · 文字撰稿</li>
+            <li>王雅婕：摄影摄像 · 策划及编辑</li>
+            <li>陈熙官：剪辑 · 撰写报告</li>
+          </ul>
+        </div>
+
+        <div class="rounded-2xl p-4 shadow-sm glass-base static-glass" style="animation-delay: -1s;">
+          <h4 class="font-semibold text-white">资料下载</h4>
+          <p class="mt-2 text-sm text-gray-600">CSV / 视频源 / 采访记录（请部署时替换为真实下载链接）。</p>
+          <div class="mt-3 flex gap-2">
+            <a class="px-3 py-1 border rounded text-sm static-glass text-white" href="#">CSV</a>
+            <a class="px-3 py-1 border rounded text-sm static-glass text-white" href="#">视频源</a>
+          </div>
+        </div>
+
+        <div class="rounded-2xl p-4 shadow-sm glass-base static-glass" style="animation-delay: -2s;">
+          <h4 class="font-semibold text-white">项目时间轴</h4>
+          <p class="text-sm text-gray-600 mt-2">数据收集：2025.03 — 2025.10</p>
+        </div>
+      </aside>
+    </section>
+
+    <section id="videos" class="mt-12">
+      <h2 class="text-2xl font-semibold mb-4 text-white">视频作品</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="rounded-lg overflow-hidden shadow-sm glass-base liquid-card cursor-pointer" data-src="https://www.w3schools.com/html/mov_bbb.mp4" style="animation-delay: -1s;">
+          <img class="video-thumb w-full" src="https://picsum.photos/640/360?random=201" alt="v1"/>
+          <div class="p-3">
+            <div class="font-medium text-white">城市出行专题短片</div>
+            <div class="text-xs text-gray-500 mt-1">时长 04:12 · 拍摄：车文恒 / 王雅婕</div>
+          </div>
+        </div>
+        <div class="rounded-lg overflow-hidden shadow-sm glass-base liquid-card cursor-pointer" data-src="https://www.w3schools.com/html/movie.mp4" style="animation-delay: -2s;">
+          <img class="video-thumb w-full" src="https://picsum.photos/640/360?random=202" alt="v2"/>
+          <div class="p-3">
+            <div class="font-medium text-white">深度采访：专家解读</div>
+            <div class="text-xs text-gray-500 mt-1">时长 03:35 · 采访：李思欣</div>
+          </div>
+        </div>
+        <div class="rounded-lg overflow-hidden shadow-sm glass-base liquid-card cursor-pointer" data-src="https://www.w3schools.com/html/mov_bbb.mp4" style="animation-delay: -3s;">
+          <img class="video-thumb w-full" src="https://picsum.photos/640/360?random=203" alt="v3"/>
+          <div class="p-3">
+            <div class="font-medium text-white">纪录片片段：夜间出行</div>
+            <div class="text-xs text-gray-500 mt-1">时长 02:50 · 剪辑：李盈 / 陈熙官</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="chain" class="mt-12">
+      <h2 class="text-2xl font-semibold mb-4 text-white">逻辑链条 · 报告要点</h2>
+      <div class="glass-base liquid-card rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center justify-between">
+          <button id="prev" class="px-3 py-1 border rounded static-glass text-white">上一页</button>
+          <div id="counter" class="text-sm">1 / 5</div>
+          <button id="next" class="px-3 py-1 border rounded static-glass text-white">下一页</button>
+        </div>
+        <div class="mt-6">
+          <div id="chainTitle" class="text-lg font-medium text-white">报告要点：样例卡片 1</div>
+          <p id="chainDesc" class="mt-3 text-gray-600">（点击“查看章节”可跳转到对应专题章节以获取全文与图表。）</p>
+          <div class="mt-4">
+            <button id="openChapter" class="px-3 py-2 border rounded static-glass text-white">查看章节</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="report" class="mt-12 report-section">
+      <h2 class="text-2xl font-semibold mb-4 text-white">专题章节</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <nav class="md:col-span-1 rounded-2xl p-4 shadow-sm glass-base static-glass">
+          <ul class="space-y-2 text-sm">
+            <li><a href="#chapter1" class="block py-2 px-2 rounded hover:bg-white/10 text-white">章节一：问题背景</a></li>
+            <li><a href="#chapter2" class="block py-2 px-2 rounded hover:bg-white/10 text-white">章节二：数据趋势</a></li>
+            <li><a href="#chapter3" class="block py-2 px-2 rounded hover:bg-white/10 text-white">章节三：采访与案例</a></li>
+            <li><a href="#chapter4" class="block py-2 px-2 rounded hover:bg-white/10 text-white">章节四：政策建议</a></li>
+          </ul>
+        </nav>
+        <div class="md:col-span-2 space-y-6">
+          <article id="chapter1" class="glass-base liquid-card rounded-2xl p-6 shadow-sm">
+            <h3 class="font-semibold text-lg text-white">章节一：问题背景</h3>
+            <p class="text-sm text-gray-700 mt-3">（在此放调研的背景说明、采样方法、时间窗口、研究问题。）</p>
+          </article>
+          <article id="chapter2" class="glass-base liquid-card rounded-2xl p-6 shadow-sm" style="animation-delay: -1s;">
+            <h3 class="font-semibold text-lg text-white">章节二：数据趋势</h3>
+            <p class="text-sm text-gray-700 mt-3">下面展示样例趋势图，部署时替换为真实数据并提供数据下载。</p>
+            <div class="mt-4">
+              <div class="bg-white p-4 rounded-lg">
+                <canvas id="reportChart" height="150"></canvas>
+              </div>
+            </div>
+          </article>
+          <article id="chapter3" class="glass-base liquid-card rounded-2xl p-6 shadow-sm" style="animation-delay: -2s;">
+            <h3 class="font-semibold text-lg text-white">章节三：采访与案例</h3>
+            <p class="text-sm text-gray-700 mt-3">在此展示采访摘录、关键证词与案例分析（支持音频/视频嵌入）。</p>
+          </article>
+          <article id="chapter4" class="glass-base liquid-card rounded-2xl p-6 shadow-sm" style="animation-delay: -3s;">
+            <h3 class="font-semibold text-lg text-white">章节四：政策建议</h3>
+            <p class="text-sm text-gray-700 mt-3">根据数据与采访，给出清晰、可执行的政策建议与行动清单。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="data" class="mt-12">
+      <h2 class="text-2xl font-semibold mb-4 text-white">数据新闻 · 上牌数趋势（示例）</h2>
+      <div class="glass-base liquid-card rounded-2xl p-6 shadow-sm">
+        <div class="bg-white p-4 rounded-lg">
+          <canvas id="line" height="120"></canvas>
+        </div>
+        <p class="mt-3 text-sm text-gray-600">说明：示例数据，仅供展示。部署时请替换为真实 CSV/JSON。</p>
+      </div>
+    </section>
+
+    <section id="quiz" class="mt-12">
+      <h2 class="text-2xl font-semibold mb-4 text-white">互动问答</h2>
+      <div class="glass-base liquid-card rounded-2xl p-6 shadow-sm space-y-4">
+        <div>
+          <div class="font-medium text-white">你认为：目前最需要优先解决的出行问题是？</div>
+          <div class="mt-3 flex gap-2">
+            <button class="px-3 py-2 border rounded vote static-glass text-white">基础设施</button>
+            <button class="px-3 py-2 border rounded vote static-glass text-white">执法管理</button>
+            <button class="px-3 py-2 border rounded vote static-glass text-white">市民教育</button>
+          </div>
+          <div class="mt-2 text-sm text-gray-600 vote-feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="members" class="mt-12 report-section">
+      <h2 class="text-2xl font-semibold mb-4 text-white">小组成员</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="glass-base liquid-card rounded-2xl p-4 shadow-sm" style="animation-delay: -0.5s;">
+          <div class="font-medium text-white">京若琛</div>
+          <div class="text-sm text-gray-600 mt-1">脚本及解说词 · 图表制作</div>
+        </div>
+        <div class="glass-base liquid-card rounded-2xl p-4 shadow-sm" style="animation-delay: -1s;">
+          <div class="font-medium text-white">车文恒</div>
+          <div class="text-sm text-gray-600 mt-1">摄影摄像 · 数据分析</div>
+        </div>
+        <div class="glass-base liquid-card rounded-2xl p-4 shadow-sm" style="animation-delay: -1.5s;">
+          <div class="font-medium text-white">李盈</div>
+          <div class="text-sm text-gray-600 mt-1">剪辑 · 文字撰稿</div>
+        </div>
+        <div class="glass-base liquid-card rounded-2xl p-4 shadow-sm" style="animation-delay: -2s;">
+          <div class="font-medium text-white">李思欣</div>
+          <div class="text-sm text-gray-600 mt-1">采访 · 文字撰稿</div>
+        </div>
+        <div class="glass-base liquid-card rounded-2xl p-4 shadow-sm" style="animation-delay: -2.5s;">
+          <div class="font-medium text-white">王雅婕</div>
+          <div class="text-sm text-gray-600 mt-1">摄影摄像 · 策划及编辑</div>
+        </div>
+        <div class="glass-base liquid-card rounded-2xl p-4 shadow-sm" style="animation-delay: -3s;">
+          <div class="font-medium text-white">陈熙官</div>
+          <div class="text-sm text-gray-600 mt-1">剪辑 · 撰写报告</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="dark-glass mt-12 border-t py-6 text-center text-gray-600 text-sm">
+    © 2025 融合新闻专题 | 广州市高校新闻实践
+  </footer>
+
+  <script>
+    // --- Chart.js 示例保持不变 ---
+    const ctx = document.getElementById('reportChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['2020','2021','2022','2023','2024','2025'],
+        datasets: [{
+          label: '电动车上牌数（万）',
+          data: [50, 70, 85, 90, 105, 120],
+          backgroundColor: 'rgba(99,102,241,0.7)',
+          borderRadius: 6
+        }]
+      },
+      options: { responsive:true, plugins:{legend:{display:false}} }
+    });
+
+    const lineCtx = document.getElementById('line').getContext('2d');
+    new Chart(lineCtx, {
+      type:'line',
+      data: {
+        labels:['2020','2021','2022','2023','2024','2025'],
+        datasets:[{label:'上牌数',data:[50,70,85,90,105,120],borderColor:'rgb(99,102,241)',tension:0.3,fill:false}]
+      },
+      options:{responsive:true,plugins:{legend:{display:false}}}
+    });
+
+    // 投票交互
+    document.querySelectorAll('.vote').forEach(btn=>{
+      btn.addEventListener('click',()=>{ btn.parentElement.querySelector('.vote-feedback').innerText='已投票'; })
+    });
+    
+    // 逻辑链条交互
+    const chainData = [
+        { title: "报告要点：问题与背景", desc: "电动车牌照发放收紧背景下的社会影响。", chapter: "#chapter1" },
+        { title: "报告要点：数据分析", desc: "近五年电动车上牌数与违章趋势可视化分析。", chapter: "#chapter2" },
+        { title: "报告要点：市民声音", desc: "收录了多位市民、快递员和交通专家的一手采访。", chapter: "#chapter3" },
+        { title: "报告要点：政策建议", desc: "基于数据和采访的系统性政策调整建议。", chapter: "#chapter4" },
+        { title: "报告要点：总结与展望", desc: "展望城市交通治理的未来方向与挑战。", chapter: "#report" }
+    ];
+    let currentIndex = 0;
+    const chainTitle = document.getElementById('chainTitle');
+    const chainDesc = document.getElementById('chainDesc');
+    const counter = document.getElementById('counter');
+    const openChapter = document.getElementById('openChapter');
+
+    function updateChain(index) {
+        const item = chainData[index];
+        chainTitle.textContent = item.title;
+        chainDesc.textContent = item.desc;
+        openChapter.onclick = () => { document.querySelector(item.chapter).scrollIntoView({ behavior: 'smooth' }); };
+        counter.textContent = `${index + 1} / ${chainData.length}`;
+        document.getElementById('prev').disabled = index === 0;
+        document.getElementById('next').disabled = index === chainData.length - 1;
+    }
+
+    document.getElementById('prev').addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateChain(currentIndex);
+        }
+    });
+
+    document.getElementById('next').addEventListener('click', () => {
+        if (currentIndex < chainData.length - 1) {
+            currentIndex++;
+            updateChain(currentIndex);
+        }
+    });
+
+    // 初始化显示第一项
+    updateChain(currentIndex);
+  </script>
+
+</body>
+</html>
