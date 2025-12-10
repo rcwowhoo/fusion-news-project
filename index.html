@@ -9,325 +9,1288 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>tailwind.config = {theme: {extend: {}}}</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
   <style>
-    /* --- 0. 全局设置 (深海军蓝) --- */
     body { 
         font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        background: #1e293b; /* 深海军蓝背景 */
-        color: #f3f4f6; 
+        background: #1e293b;
+        color: #f3f4f6;
         min-height: 100vh;
         margin: 0;
         overflow-x: hidden;
     }
-    
-    /* 字体颜色优化：在深色背景下保持清晰 */
-    .text-gray-900, .text-gray-700, .text-gray-600, .text-gray-500 {
-         color: #cbd5e1 !important; 
-    }
+    .text-gray-900, .text-gray-700, .text-gray-600, .text-gray-500 { color: #cbd5e1 !important; }
 
-    /* --- 1. 微流体呼吸动画 (Subtle Liquid) --- */
     @keyframes liquid-breathing {
-        0% { border-radius: 16px 16px 16px 16px; }
+        0% { border-radius: 16px; }
         33% { border-radius: 18px 14px 17px 15px / 15px 17px 14px 18px; } 
         66% { border-radius: 14px 18px 15px 17px / 17px 15px 18px 14px; } 
-        100% { border-radius: 16px 16px 16px 16px; }
+        100% { border-radius: 16px; }
     }
 
-    /* --- 2. 玻璃卡片基础与悬停逻辑 (核心融合) --- */
     .glass-base {
-        backdrop-filter: blur(16px);         
-        -webkit-backdrop-filter: blur(16px);
-        border-radius: 16px; 
-        
-        /* 核心过渡时间：0.5s，用于 liquid-card (深度悬停) */
-        transition: 
-            transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
-            box-shadow 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
-            background 0.5s ease,
-            border-color 0.5s ease;
-            
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        border-radius: 16px;
+        transition: transform 0.5s cubic-bezier(0.25,0.8,0.25,1), box-shadow 0.5s cubic-bezier(0.25,0.8,0.25,1), background 0.5s ease, border-color 0.5s ease;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     }
-    
-    /* 液态卡片 (用于大区块, 统一使用深色背景下的液体效果) */
+
     .liquid-card {
-        background: rgba(255, 255, 255, 0.1); 
-        border: 1px solid rgba(255, 255, 255, 0.2); /* 默认微弱边框 */
-        animation: liquid-breathing 10s ease-in-out infinite; 
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        animation: liquid-breathing 10s ease-in-out infinite;
     }
-    
-    /* liquid-card 悬停状态：高光 + 浮动 (一致的深度悬停效果) */
     .liquid-card:hover {
         animation-play-state: paused;
-        transform: translateY(-6px) scale(1.01); /* 深度的上浮 */
-        border-radius: 16px; 
-        background: rgba(255, 255, 255, 0.15); 
-        
-        /* 核心光影 */
-        border-color: rgba(255, 255, 255, 0.6); 
-        box-shadow: 
-            0 0 25px rgba(255, 255, 255, 0.15), 
-            0 20px 40px -5px rgba(0, 0, 0, 0.4); 
+        transform: translateY(-6px) scale(1.01);
+        background: rgba(255,255,255,0.15);
+        border-color: rgba(255,255,255,0.6);
+        box-shadow: 0 0 25px rgba(255,255,255,0.15), 0 20px 40px -5px rgba(0,0,0,0.4);
     }
 
-    /* 静态卡片 (用于按钮、小图，仅作为基础样式) */
     .static-glass {
-        background: rgba(255, 255, 255, 0.1); 
-        border: 1px solid rgba(255, 255, 255, 0.2); 
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
         border-radius: 12px;
     }
-    
-    /* 按钮/链接悬停：更灵敏，发光更强 (使用单独的 0.3s 过渡) */
     a.static-glass, button.static-glass, .vote.static-glass {
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        transition: all 0.3s cubic-bezier(0.25,0.8,0.25,1) !important;
     }
-    
     a.static-glass:hover, button.static-glass:hover, .vote.static-glass:hover {
-        transform: translateY(-3px); /* 较浅的上浮 */
-        background: rgba(255, 255, 255, 0.25);
-        border-color: rgba(255, 255, 255, 0.8); /* 亮白边框 */
-        box-shadow: 
-            0 0 15px rgba(255, 255, 255, 0.3), /* 强光晕 */
-            0 10px 20px -5px rgba(0, 0, 0, 0.3);
+        transform: translateY(-3px);
+        background: rgba(255,255,255,0.25);
+        border-color: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(255,255,255,0.3), 0 10px 20px -5px rgba(0,0,0,0.3);
     }
-    
-    /* 导航栏 */
-    .dark-glass {
-        background: rgba(30, 41, 59, 0.9); 
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    nav a {
-        color: #f3f4f6; 
-        transition: color 0.3s ease;
-        padding: 0.5rem;
-    }
+
+    .dark-glass { background: rgba(30,41,59,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+    nav a { color: #f3f4f6; transition: color 0.3s ease; padding: 0.5rem; }
     nav a:hover { color: #38bdf8; }
 
-    /* 辅助样式 */
-    .video-thumb { aspect-ratio:16/9; object-fit:cover }
-    .report-section { scroll-margin-top:100px }
+    .report-section { scroll-margin-top:100px; }
+    .prose img { max-width: 100%; border-radius: 12px; }
   </style>
+
 </head>
 <body class="text-gray-900">
 
-  <header class="dark-glass sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-6">
-        <a href="#" class="text-2xl font-bold text-white tracking-wide">第32组 · 融合新闻</a>
-        <nav class="hidden md:flex gap-2 text-sm font-medium">
-          <a href="#hero">首页</a>
-          <a href="#report">图文报道</a>
-          <a href="#data">数据新闻</a>
-          <a href="#video-section">核心视频</a>
-          <a href="#members">小组成员</a>
-        </nav>
+<header class="dark-glass sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-6">
+      <a href="#" class="text-2xl font-bold text-white tracking-wide">第32组 · 融合新闻</a>
+      <nav class="hidden md:flex gap-2 text-sm font-medium">
+        <a href="#hero">首页</a>
+        <a href="#report">图文报道</a>
+        <a href="#data">数据新闻</a>
+        <a href="#video-section">核心视频</a>
+        <a href="#members">小组成员</a>
+      </nav>
+    </div>
+    
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-10">
+
+  <!-- HERO SECTION -->
+  <section id="hero" class="grid md:grid-cols-3 gap-8 items-start">
+    <div class="md:col-span-2 space-y-8">
+      <div class="p-8 glass-base liquid-card">
+        <div class="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-wider text-indigo-300 uppercase border border-indigo-400/30 rounded-full bg-indigo-400/10">
+          深度融合报道 · 2025
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+          广州市电动车围城下的<br>民生困境以及新规实施后的效果
+        </h1>
+        <p class="text-lg text-gray-300 leading-relaxed mb-8">
+          随着新规落地，百万电动车大军何去何从？本专题通过实地走访、数据分析与影像记录，为您呈现这一城市治理难题的多维切面。
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#report" class="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 font-semibold glass-base shadow-lg border-0">
+            📖 阅读图文报道
+          </a>
+	<a href="#data" class="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 font-semibold glass-base shadow-lg border-0">
+            📊 阅读数据新闻
+          </a>
+          <a href="#video-section" class="px-6 py-3 border border-white/30 rounded-xl static-glass text-white font-medium">
+            🎬 观看视频
+          </a>
+        </div>
       </div>
-      <div class="flex items-center gap-3">
-        <a href="#" class="px-5 py-2 border border-white/20 rounded-full text-sm static-glass text-white font-medium">📥 下载附件</a>
+
+      <div class="rounded-2xl overflow-hidden shadow-lg glass-base liquid-card" style="animation-delay: -2s;">
+        <img id="coverImg" src="assets/img/banner.jpg" ... />
       </div>
     </div>
-  </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-10">
-
-    <section id="hero" class="grid md:grid-cols-3 gap-8 items-start">
-      <div class="md:col-span-2 space-y-8">
-        <div class="p-8 glass-base liquid-card">
-          <div class="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-wider text-indigo-300 uppercase border border-indigo-400/30 rounded-full bg-indigo-400/10">
-            深度融合报道 · 2025
-          </div>
-          <h1 class="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
-            广州市电动车围城下的<br>民生困境以及新规实施后的效果
-          </h1>
-          <p class="text-lg text-gray-300 leading-relaxed mb-8">
-            随着新规落地，百万电动车大军何去何从？本专题通过实地走访、数据分析与影像记录，为您呈现这一城市治理难题的多维切面。
-          </p>
-          <div class="flex flex-wrap gap-4">
-            <a href="#report" class="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 font-semibold glass-base shadow-lg border-0">
-              📖 阅读图文报道
-            </a>
-            <a href="#video-section" class="px-6 py-3 border border-white/30 rounded-xl static-glass text-white font-medium">
-              🎬 观看视频
-            </a>
-          </div>
-        </div>
-
-        <div class="rounded-2xl overflow-hidden shadow-lg glass-base liquid-card" style="animation-delay: -2s;">
-          <img id="coverImg" src="https://picsum.photos/1200/600?random=101" alt="专题长图" class="w-full object-cover max-h-[50vh] opacity-90 hover:opacity-100 transition-opacity duration-500" />
-        </div>
+    <aside class="space-y-6 md:sticky md:top-24">
+      <div id="aside-members" class="p-6 glass-base liquid-card" style="animation-delay: -3s;">
+        <h4 class="font-bold text-white text-lg mb-4 border-b border-white/10 pb-2">👥 第32组成员</h4>
+        <ul class="text-sm text-gray-300 space-y-3">
+          <li class="flex justify-between"><span>京若琛</span> <span>脚本/图表/采访</span></li>
+          <li class="flex justify-between"><span>车文恒</span> <span>摄影/数据</span></li>
+          <li class="flex justify-between"><span>李盈</span> <span>剪辑/文案</span></li>
+          <li class="flex justify-between"><span>李思欣</span> <span>剪辑/文案</span></li>
+          <li class="flex justify-between"><span>王雅婕</span> <span>摄影/策划</span></li>
+          <li class="flex justify-between"><span>陈熙官</span> <span>图片拍摄/报告</span></li>
+        </ul>
       </div>
 
-      <aside class="space-y-6 md:sticky md:top-24">
-        
-        <div id="aside-members" class="p-6 glass-base liquid-card" style="animation-delay: -3s;">
-          <h4 class="font-bold text-white text-lg mb-4 border-b border-white/10 pb-2">👥 第32组成员</h4>
-          <ul class="text-sm text-gray-300 space-y-3">
-            <li class="flex justify-between"><span>京若琛</span> <span>脚本/图表/采访</span></li>
-            <li class="flex justify-between"><span>车文恒</span> <span>摄影/数据</span></li>
-            <li class="flex justify-between"><span>李盈</span> <span>剪辑/文案</span></li>
-            <li class="flex justify-between"><span>李思欣</span> <span>剪辑/文案</span></li>
-            <li class="flex justify-between"><span>王雅婕</span> <span>摄影/策划</span></li>
-            <li class="flex justify-between"><span>陈熙官</span> <span>图片拍摄/报告</span></li>
-          </ul>
-        </div>
+<div class="p-6 glass-base liquid-card relative overflow-hidden group" style="animation-delay: -1s;">
+  <div class="absolute top-0 right-0 w-20 h-20 bg-indigo-500/20 rounded-full blur-2xl -mr-10 -mt-10 transition-opacity group-hover:opacity-40"></div>
 
-        <div class="p-6 glass-base liquid-card" style="animation-delay: -1s;">
-          <h2 class="text-xl font-bold mb-3 text-white">📌 导读 / 摘要</h2>
-          <p class="text-gray-300 text-sm leading-relaxed">
-            本专题分为三个部分：首先通过一篇深度图文报道，还原市民真实的出行困境；其次利用数据可视化分析新规实施前后的违章与事故变化；最后通过一支短视频记录一线执法现场与市民声音。
-          </p>
-        </div>
-      </aside>
-    </section>
-
-    <section id="video-section" class="mt-20 report-section">
-      <h2 class="text-3xl font-bold mb-8 text-white flex items-center gap-3">
-        <span class="text-indigo-400">🎥</span> 影像记录：核心视频展映
-      </h2>
-      
-      <div class="p-2 glass-base liquid-card rounded-2xl">
-        <div class="bg-black/40 rounded-xl overflow-hidden aspect-video relative group cursor-pointer">
-            <video controls poster="https://picsum.photos/1280/720?random=2" class="w-full h-full object-cover">
-                <source src="movie.mp4" type="video/mp4">
-                您的浏览器不支持视频标签。
-            </video>
-        </div>
-        <div class="p-6">
-            <h3 class="text-2xl font-bold text-white mb-2">纪录片：禁行令下的两难抉择</h3>
-            <p class="text-gray-300">时长 05:30 · 拍摄：车文恒 / 王雅婕 / 陈熙官 · 剪辑：李思欣 / 李盈</p>
+  <h2 class="text-xl font-bold mb-4 text-white flex items-center gap-2">
+    <span class="text-2xl">🧭</span> 专题导读
+  </h2>
+  
+  <div class="space-y-3">
+    <a href="#report" class="block p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-indigo-500/20 hover:border-indigo-500/30 transition-all group/item">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">📑</span>
+        <div>
+          <h3 class="text-sm font-bold text-indigo-200 group-hover/item:text-white transition-colors">深度图文</h3>
+          <p class="text-xs text-gray-400 mt-0.5">直击岗顶“围城”乱象现场</p>
         </div>
       </div>
-    </section>
+    </a>
 
-    <section id="report" class="mt-20 report-section">
-      <h2 class="text-3xl font-bold mb-8 text-white flex items-center gap-3">
-        <span class="text-indigo-400">📑</span> 深度图文报道：全文
-      </h2>
-      
-      <div class="glass-base liquid-card rounded-3xl p-8 md:p-12">
-        <article class="prose prose-invert prose-lg max-w-none">
-            <h3 class="text-3xl font-bold text-white mb-6">困在系统里的“最后一公里”</h3>
-            <div class="flex items-center gap-4 text-sm text-gray-400 mb-8 border-b border-white/10 pb-6">
-                <span>文 / 李思欣 李盈</span>
-                <span>图 / 陈熙官 王雅婕</span>
-                <span>2025年10月</span>
-            </div>
-
-            <p class="leading-8 text-gray-300">
-                （这里是放置你的长篇图文报道的位置。你可以直接复制 Word 文档里的内容粘贴到这里，并用 p 标签包裹。）
-            </p>
-            <p class="leading-8 text-gray-300">
-                广州的早高峰，天河路口。数以千计的电动车如同潮水般涌向红绿灯路口，交警的哨声被淹没在喇叭声中。这是新规实施后的第一个月...
-            </p>
-            
-            <figure class="my-8">
-                <img src="https://picsum.photos/800/400?random=3" alt="现场照片" class="w-full rounded-xl shadow-lg glass-base">
-                <figcaption class="text-center text-sm text-gray-400 mt-3">图1：早高峰期间拥堵的路口</figcaption>
-            </figure>
-
-            <p class="leading-8 text-gray-300">
-                市民刘先生表示：“如果不骑电动车，我每天通勤时间要增加40分钟。但现在的路况确实太乱了，新规虽然严格，但执行起来还是有难度...”
-            </p>
-            
-            <h4 class="text-2xl font-bold text-white mt-10 mb-4">新规落地的阵痛期</h4>
-            <p class="leading-8 text-gray-300">
-                从数据上看，新规实施后，违章率确实有了短期的下降，但随之而来的是...
-            </p>
-        </article>
-      </div>
-    </section>
-
-    <section id="data" class="mt-20 report-section">
-      <h2 class="text-3xl font-bold mb-8 text-white flex items-center gap-3">
-        <span class="text-indigo-400">📊</span> 数据新闻：深度可视化分析
-      </h2>
-      
-      <div class="grid md:grid-cols-2 gap-8">
-        <div class="p-8 glass-base liquid-card rounded-2xl" style="animation-delay: -3s;">
-            <h3 class="text-xl font-bold text-white mb-6">新规实施前后违章数量对比</h3>
-            <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                <canvas id="violationChart" height="200"></canvas>
-            </div>
-            <p class="mt-4 text-sm text-gray-400">数据来源：广州交警支队公开数据</p>
-        </div>
-
-        <div class="p-8 glass-base liquid-card rounded-2xl" style="animation-delay: -5s;">
-            <h3 class="text-xl font-bold text-white mb-6">市民出行方式选择占比</h3>
-            <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                <canvas id="transportChart" height="200"></canvas>
-            </div>
-            <p class="mt-4 text-sm text-gray-400">数据来源：小组问卷调查 (N=500)</p>
+    <a href="#data" class="block p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-purple-500/20 hover:border-purple-500/30 transition-all group/item">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">📊</span>
+        <div>
+          <h3 class="text-sm font-bold text-purple-300 group-hover/item:text-white transition-colors">数据分析</h3>
+          <p class="text-xs text-gray-400 mt-0.5">数读新规实施前后变化</p>
         </div>
       </div>
-      
-      <div class="mt-8 p-8 glass-base liquid-card rounded-2xl" style="animation-delay: -7s;">
-          <h4 class="font-bold text-white text-lg mb-2">数据洞察</h4>
-          <p class="text-gray-300 leading-7">
-              数据显示，新规实施首月，虽然头盔佩戴率提升至 90% 以上，但“闯红灯”与“逆行”现象在非主干道依然高发。此外，有 35% 的受访者表示，如果限制过严，可能会转向“共享单车”或“非法营运摩的”，这可能带来新的管理盲区。
-          </p>
-      </div>
-    </section>
+    </a>
 
-    <section id="quiz" class="mt-20 mb-20 report-section">
-      <h2 class="text-3xl font-bold mb-8 text-white text-center">💬 参与讨论</h2>
-      <div class="p-10 glass-base liquid-card rounded-2xl text-center max-w-4xl mx-auto">
-        <div class="font-medium text-white text-2xl mb-8">你认为目前电动车治理最大的难点是？</div>
-        <div class="grid sm:grid-cols-3 gap-4">
-          <button class="py-4 px-6 border border-white/30 rounded-xl vote static-glass text-white hover:bg-indigo-600/60 transition-colors text-lg">
-            🚧 道路规划不合理
-          </button>
-          <button class="py-4 px-6 border border-white/30 rounded-xl vote static-glass text-white hover:bg-indigo-600/60 transition-colors text-lg">
-            🛵 骑手安全意识差
-          </button>
-          <button class="py-4 px-6 border border-white/30 rounded-xl vote static-glass text-white hover:bg-indigo-600/60 transition-colors text-lg">
-            👮‍♂️ 执法标准不统一
-          </button>
+    <a href="#video-section" class="block p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-pink-500/20 hover:border-pink-500/30 transition-all group/item">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">🎬</span>
+        <div>
+          <h3 class="text-sm font-bold text-pink-300 group-hover/item:text-white transition-colors">核心视频</h3>
+          <p class="text-xs text-gray-400 mt-0.5">记录民生困境与市民声音</p>
         </div>
-        <div class="mt-6 text-base text-indigo-300 font-bold vote-feedback h-6"></div>
       </div>
-    </section>
+    </a>
+  </div>
+</div>
+    </aside>
+  </section>
+
+<section id="report" class="mt-20 report-section">
+    <h2 class="text-3xl font-bold mb-8 text-white flex items-center gap-3">
+      <span class="text-indigo-400">📑</span> 图文报道：乱象调查
+    </h2>
     
-    <section id="members" class="mt-20 report-section">
-        <h2 class="text-3xl font-bold mb-8 text-white flex items-center gap-3">
-            <span class="text-indigo-400">👥</span> 第32组小组成员与分工
-        </h2>
-        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <div class="p-6 glass-base liquid-card rounded-2xl group">
-                <div class="font-bold text-xl text-white group-hover:text-indigo-300">京若琛</div>
-                <div class="text-sm text-gray-400 mt-2">脚本及解说词 · 图表制作 · 采访</div>
-            </div>
-            <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -1s;">
-                <div class="font-bold text-xl text-white group-hover:text-indigo-300">车文恒</div>
-                <div class="text-sm text-gray-400 mt-2">摄影摄像 · 数据分析</div>
-            </div>
-            <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -2s;">
-                <div class="font-bold text-xl text-white group-hover:text-indigo-300">李盈</div>
-                <div class="text-sm text-gray-400 mt-2">剪辑 · 文字撰稿</div>
-            </div>
-            <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -3s;">
-                <div class="font-bold text-xl text-white group-hover:text-indigo-300">李思欣</div>
-                <div class="text-sm text-gray-400 mt-2">剪辑 · 文字撰稿</div>
-            </div>
-            <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -4s;">
-                <div class="font-bold text-xl text-white group-hover:text-indigo-300">王雅婕</div>
-                <div class="text-sm text-gray-400 mt-2">摄影摄像 · 策划及编辑</div>
-            </div>
-            <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -5s;">
-                <div class="font-bold text-xl text-white group-hover:text-indigo-300">陈熙官</div>
-                <div class="text-sm text-gray-400 mt-2">图片拍摄 · 撰写报告</div>
+    <div class="glass-base liquid-card rounded-3xl p-8 md:p-12 max-h-[85vh] overflow-y-auto">
+      <article class="prose prose-invert prose-xl max-w-none">
+        
+        <h3 class="text-4xl font-extrabold text-white mb-6">广州市岗顶电动车“围城”乱象调查研究</h3>
+        <div class="flex items-center gap-4 text-sm text-gray-400 mb-10 border-b border-white/10 pb-6">
+          <span>文 / 李思欣 李盈</span>
+          <span>图 / 陈熙官 王雅婕</span>
+          <span>2025年11月</span>
+        </div>
+
+        <h4 class="text-2xl font-bold text-indigo-300 mt-10 mb-4">引言：岗顶电动车“围城”现象概览</h4>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          在广州市天河区的中心地带——岗顶，以其密集的写字楼、繁华的商贸城与华南师范大学、暨南大学等高校共同构成了一片充满活力的区域。然而，每日早晚高峰，一种钢铁洪流便会在这里上演——数以万计的电动自行车，如同潮水般涌向每一个路口、每一条巷弄，将这里变成一座进退维谷的“围城”。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig1.jpg" alt="岗顶地铁站口的电瓶车" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图1：岗顶地铁站口的电瓶车</figcaption>
+        </figure>
+        
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          城内，是依赖它谋生、求学的庞大人群；城外，是因其引发的安全隐患与公共空间争夺。这座“围城”不仅是交通工具的简单汇聚，更是城市发展、民生需求与管理智慧之间复杂博弈的集中体现。一位每日骑行四五公里通勤的学生坦言，电动车是出行的刚需，但“经常被刮到车，手脚也会有磕碰，让人很头疼”——这或许是无数穿行于此的市民最日常、也最无奈的体验。
+        </p>
+
+        <h4 class="text-2xl font-bold text-indigo-300 mt-10 mb-4">一、现状剖析：岗顶电动车“围城”的具体困境</h4>
+
+        <h5 class="text-xl font-bold text-teal-300 mt-8 mb-3">1. 安全失序：“霸道”行驶与步步惊心</h5>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          在岗顶，交通规则的约束力在现实压力面前常常显得脆弱。对于许多行人，尤其是学生家长而言，出行宛如一场需要高度警惕的“冒险”。一位学生家长的遭遇极具代表性：“我都被撞过五六次，前几天还刚被撞过。”她尤其担忧学校附近的环境，“有些家长或骑手看到学生在马路上跑也不减速，直接冲过去。” 这种对公共安全空间的挤压，制造了持续的紧张与恐惧。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig2.png" alt="采访社区居民" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图2：社区居民接受小组成员的采访</figcaption>
+        </figure>
+        
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          而混乱的另一面，是部分骑手在系统规则下的无奈。一位美团骑手道出了背后的辛酸：平台限定的配送时间较为严苛，“按25迈的速度送外卖不行，想不超时或者多送几单，时速至少得四五十码。” 尽管他个人选择遵守交规，但也承认“身边很多骑手都会闯红灯，因为想多跑点单。” 当效率与安全成为非此即彼的选择题时，规则的失守便成为某种“常态”。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig3.png" alt="采访外卖骑手" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图3：外卖骑手接受小组成员的采访</figcaption>
+        </figure>
+
+        <h5 class="text-xl font-bold text-teal-300 mt-8 mb-3">2. 空间争夺：无序停放与举步维艰</h5>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          岗顶的“围城”之困，在地铁口、商贸城周边尤为突出。大量电动车见缝插针地停放，蚕食着本已狭窄的人行道。那位通勤的学生精准地指出了问题所在：“地铁口的电动车停放杂乱，导致人行道空间变小，行人走路时容易被电动车撞到或刮蹭。” 人行道功能的丧失，迫使行人走上机动车道，进一步加剧了人车混行的危险局面。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig4.jpg" alt="人车混行" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图4：人车混行</figcaption>
+        </figure>
+
+        <h5 class="text-xl font-bold text-teal-300 mt-8 mb-3">3. 设施之困：道路设计与充电安全</h5>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          “电鸡”围城困境还体现在硬件设施的滞后与不匹配上。一方面，道路资源分配不均，非机动车道缺失或过于狭窄，无法承载如此庞大的车流。学生的建议“希望拓宽电动车道”直指这一核心矛盾。另一方面，一位家长则关注到了更基础的“道路不平”问题，这直接影响了骑行的舒适性与安全性。
+        </p>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          但值得欣慰的是，在充电安全方面，岗顶地区深受认可。无论是学生使用的宿舍楼下充电柜，家长所在小区的公共充电桩，还是美团骑手口中“几百米就有一个”的商用换电柜，都体现出规范化、集中化的充电网络正在逐步覆盖，有效减少了“飞线充电”等老旧隐患。
+        </p>
+
+        <h4 class="text-2xl font-bold text-indigo-300 mt-10 mb-4">二、根源探究：岗顶为什么会沦为“电动车围城”的重灾区？</h4>
+
+        <h5 class="text-xl font-bold text-yellow-300 mt-8 mb-3">1. 人口基数庞大，刚需催生“电鸡”洪流</h5>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          岗顶的电动车保有量激增，根源在于这一片区庞大的人口基数与刚性出行需求。作为天河区商业与科教资源的密集区，这里聚集了天河电脑城、百脑汇等大型数码商圈，以及华南师范大学等高校，周边还有城中村密集居民区，日常常住人口与工作人口之和常年保持在**15万以上**。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig5.jpg" alt="岗顶地铁站门口违停的电瓶车" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图5：“岗顶”地铁站门口违停的电瓶车</figcaption>
+        </figure>
+        
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          广州全市电动自行车登记上牌数量已超570万辆，而岗顶所在的天河区作为核心城区，电动自行车保有量占比极大，电动车需求呈现“全民化”特征：周边上班族中，超三成选择电动车通勤——相比挤爆的地铁3号线和拥堵的地面公交，**25分钟的骑行路程**成为“性价比最优解”；就连高校学生和社区老人，也将电动车作为采购、出行的首选。
+        </p>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          数据显示，广州日均电动车骑行量达903万人次，而岗顶及周边1平方公里范围内，高峰时段每小时电动车通行量就超过**8000辆**，在人口密度与出行需求的双重挤压下，这里的电动车数量常年处于“超饱和”状态。
+        </p>
+
+        <h5 class="text-xl font-bold text-yellow-300 mt-8 mb-3">2. 道路规划失衡，“人车分流”难以实现</h5>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          “非机动车道车太多了，根本不敢走。”一位学生家长的抱怨，道出了岗顶道路规划的核心问题。作为广州早期城市发展的核心区域，岗顶的道路规划带有明显的“机动车优先”原则，非机动车道的缺失与狭窄成为先天缺陷。
+        </p>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          实地走访发现，岗顶核心路段的机动车道普遍为双向4-6车道，但独立非机动车道宽度多在**1.2-2米之间**，远未达到2.5米的国标要求。这种规划缺陷直接导致“人、电动自行车、机动车混行”乱象：电动自行车不得不驶入人行道，而机动车变道时又需提防穿梭的电动自行车，中山三院对出路段曾因此频繁出现剐蹭事故。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig6.jpg" alt="电瓶车开上机动车道" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图6：电瓶车开上机动车道</figcaption>
+        </figure>
+        
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          即便近年来广州新增非机动车道近2000公里，岗顶的交通改善依然有限。BRT岗顶站周边虽开放社会车辆借道以缓解拥堵，但电动自行车的通行空间并未同步拓展，部分新增的混行车道反而成为电动车与机动车抢道的“新战场”。道路资源分配的失衡，让“人车分流”成为一句空话，也为电动车违规行驶埋下伏笔。
+        </p>
+
+        <h5 class="text-xl font-bold text-yellow-300 mt-8 mb-3">3. 人口流动频繁，治理陷入“管不胜管”困境</h5>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          岗顶“电动车围城”问题难以根治，还在于其人口流动性强带来的治理难题。这里不仅是固定人口的生活圈，更是典型的的流动人口集散地——数码商圈的采购客、高校的学生、跨区通勤的上班族，构成了复杂的流动群体。
+        </p>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          流动人口对交通规则的认知程度参差不齐，部分临时来访人员随意停放电动车，导致地铁口、商场门口常出现“僵尸车”挤占通道的情况。数码商圈的流动采购客多为跨区而来，对岗顶的停车规则不熟悉，也缺乏长期遵守的意识，为图方便直接将车停在商铺门口，执法人员清理后，新一批又会重复同样行为。高校流动学生与临时访客，他们的出行随机性强，常在地铁口、公交站周边临时停车，且多选择无人看管的“灰色区域”，导致整治效果难以留存。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig7.jpg" alt="地铁口的“僵尸车”" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图7：地铁口的“僵尸车”</figcaption>
+        </figure>
+        
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          这种“整治-反弹-再整治”的循环，不仅消耗大量执法资源，更让交通秩序陷入“管不胜管”的被动局面，成为岗顶电动车治理最棘手的痛点。
+        </p>
+
+        <h4 class="text-2xl font-bold text-indigo-300 mt-10 mb-4">三、系统化治理的建议</h4>
+
+        <h5 class="text-xl font-bold text-purple-300 mt-8 mb-3">1. 优化道路通行格局，实现“人车分流”</h5>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          针对岗顶片区部分路段机动车、电动自行车与行人混行的乱象，可从道路空间重构入手，通过压缩非必要的道路闲置空间来拓宽非机动车道，同时明确电动自行车的通行区域。在人行道区域增设物理隔离设施，比如高度适宜的护栏、路缘石抬升等拦路设施，既不影响行人正常通行，又能有效阻挡电动自行车违规闯入。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig8.jpg" alt="中山三院禁止停车警示牌" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图8：中山三院禁止停车警示牌</figcaption>
+        </figure>
+        
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          针对岗顶片区实地路况，结合片区商圈、居民区与写字楼的分布特点，在学校、医院等重点区域周边强化隔离效果，而在电动自行车出行需求集中的路段，可配套设置清晰的指引标识，引导车辆有序驶入专用通道，从空间上切断违规通行的可能，减少交通冲突。
+        </p>
+        
+        <figure class="my-8">
+          <img src="assets/img/fig9.jpg" alt="天桥上禁止骑行的警示牌" class="w-3/4 h-[450px] object-cover mx-auto rounded-xl shadow-lg glass-base">
+          <figcaption class="text-center text-sm text-gray-400 mt-3">图9：天桥上禁止骑行的警示牌</figcaption>
+        </figure>
+
+        <h5 class="text-xl font-bold text-purple-300 mt-8 mb-3">2. 完善充电保障体系，强化规范管理</h5>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          飞线充电、入户充电是岗顶片区电动自行车治理的突出痛点，要根治这一乱象，必须疏堵结合。一方面要扩大充电设施的覆盖范围，在居民小区、写字楼停车场、路边停车带等区域集中增设公共充电桩，结合片区人口密度合理布局充电点位，满足居民就近充电的需。
+        </p>
+        <p class="leading-8 text-gray-300 [text-indent:2em]">
+          另一方面需建立健全全链条治理体系，明确物业、社区与相关部门的监管责任，通过上门排查、宣传引导等方式，向居民普及违规充电的安全风险。对排查出的飞线、入户充电问题，采取“先告知整改、后督促落实”的方式强令整改，同时配套建立长效巡查机制，对反复违规的行为进行联合约束，形成“有设施可充、有规则可依、有责任可追”的治理闭环。
+        </p>
+        
+      </article>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.3.3/dist/echarts.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<style>
+    /* CSS 样式：确保 glass-base 和 liquid-card 效果 */
+    .glass-base {
+        background: rgba(45, 55, 72, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(71, 85, 105, 0.3);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+    .liquid-card {
+        transition: all 0.3s ease-in-out;
+    }
+    .liquid-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+    }
+    /* 解决 TailWind 无法直接处理的样式，确保深色模式下 ECharts 的外观 */
+    .visualization-container {
+        background-color: rgba(30, 41, 59, 0.6);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 2rem;
+    }
+</style>
+
+
+
+<!-- data -->
+<!-- data -->
+<!-- data -->
+
+
+
+<section id="data" class="mt-20 report-section">
+    <h2 class="text-3xl font-bold mb-8 text-white flex items-center gap-3">
+        <span class="text-indigo-400">📊</span> 数据新闻：深度可视化分析
+    </h2>
+
+    <div class="glass-base liquid-card p-8 md:p-12 rounded-3xl max-h-[85vh] overflow-y-auto space-y-14">
+
+        <div class="text-center border-b border-gray-700 pb-6 mb-8">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-indigo-300 to-purple-300 mb-6 leading-tight">
+                数读广州“电鸡”：<br class="md:hidden"/>600万辆背后的围城与破局
+            </h1>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-6 text-sm text-gray-400">
+                <span class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    作者：京若琛、车文恒、陈熙官
+                </span>
+                <span class="hidden md:inline text-gray-600">|</span>
+                <span class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    数据来源：广州交警、规划院、主要医疗机构、主要报刊
+                </span>
             </div>
         </div>
-    </section>
 
-  </main>
+        <div class="text-content space-y-4 mb-8 text-gray-200 leading-relaxed text-justify">
+            <p>&emsp;&emsp;在广州，你可以没有汽车，但不能没有电鸡。开汽车，你拥有的只是一两条车道；而开电鸡，你拥有的是整个世界。在这个地狱级难度的出行副本，电鸡才是真正的王者。人行道、机动车道、高架、隧道，没有电鸡不能开的。地铁口、校门口、公交站台，通通都是“停鸡场”。</p>
+            <p>&emsp;&emsp;2025年广州市十件民生实事名单中，关于整治电动车驾驶和停放的两个项目获得前两名的票数。为解决这一民生难题，广州市政府颁布《广州市电动自行车管理规定》，采取一系列措施整治电动车。</p>
+        </div>
 
+        <section>
+            <h3 class="text-2xl font-bold text-pink-300 mb-6 flex items-center gap-3">
+                <span class="text-white text-3xl">🛵</span> 第一章：规模与速度的“围城”
+            </h3>
+            
+            <div class="text-content space-y-4 mb-8 text-gray-200 leading-relaxed text-justify">
+                <p>&emsp;&emsp;自2021年广州市实施电动车上牌政策以来，广州市电动车上牌量年均超过 <span class="text-red-400 font-bold">百万辆</span>。到2025年累计登记上牌数量保守估计超过 <span class="text-red-400 font-bold">600万</span>。现在，广州市 <span class="text-yellow-300 font-bold">每三个人就有一辆电动车</span>，电动车成为了主要的交通工具。</p>
+            </div>
+            
+            <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-pink-600/30 shadow-lg mb-10">
+                <h4 class="text-xl font-semibold text-pink-200 mb-4">广州电动车累计登记上牌数量 (2022-2025)</h4>
+                <div id="chart-registration" class="w-full h-80 bg-gray-900/40 rounded-lg"></div>
+            </div>
+
+            <div class="text-content space-y-4 mb-8 text-gray-200 leading-relaxed text-justify">
+                <p>&emsp;&emsp;2021年，广州电动自行车日均出行量仅 <span class="text-indigo-300 font-bold">204万</span>，只是地铁的四分之一。到2022年，它迅速攀升至600万，几乎追平地铁。而在2024年，这个数字更迭达到 <span class="text-red-400 font-bold">903万</span>，首次超过地铁的888万，成为广州最重要的出行方式。</p>
+                <p>&emsp;&emsp;从比例上来看，电动自行车在三大出行方式中的占比从2021年的 <span class="text-indigo-300 font-bold">15.8%</span> 提升至2024年的 <span class="text-red-400 font-bold">42.8%</span>，市场份额 <span class="text-yellow-300 font-bold">翻了三倍</span>。这不仅意味着广州市民出行偏好的显著转变，也预示着广州在道路容量、交通管理和安全保障等方面面临全新挑战。</p>
+            </div>
+
+            <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-pink-600/30 shadow-lg">
+                <h4 class="text-xl font-semibold text-pink-200 mb-4">广州主要出行方式日均出行量对比 (2021-2024)</h4>
+                <div id="chart-daily-travel" class="w-full h-80 bg-gray-900/40 rounded-lg"></div>
+            </div>
+        </section>
+
+        <hr class="border-gray-700 my-10" />
+
+        <section>
+            <h3 class="text-2xl font-bold text-teal-300 mb-6 flex items-center gap-3">
+                <span class="text-white text-3xl">📌</span> 第二章：民生“痛点”
+            </h3>
+            <div class="text-content space-y-4 mb-8 text-gray-200 leading-relaxed text-justify">
+                <p>&emsp;&emsp;在广州，自2021年实施登记上牌政策以来，电动车数量迅速突破 <span class="text-red-400 font-bold">600万辆</span>。伴随规模增长，交通违法查处量也居高不下，且逐年上涨。过去五年，有关部门每年查处的电动车交通违法数量均超过 <span class="text-red-400 font-bold">百万宗</span>，且 <span class="text-yellow-300 font-bold">每年翻一番</span>，显示出巨大的治理压力。</p>
+            </div>
+
+            <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-red-600/30 shadow-lg mb-10">
+                <h4 class="text-xl font-semibold text-red-300 mb-4">广州电动车交通违法查处量年度趋势 (2021-2025)</h4>
+                <div id="chart-enforcement-by-year" class="w-full h-80 bg-gray-900/40 rounded-lg"></div>
+                <p class="text-gray-400 text-sm mt-4">注：实线部分为官方公布的绝对值；虚线部分为根据官方百分比增幅推算的趋势线，仅供参考。</p>
+            </div>
+            
+            <div class="text-content space-y-4 mb-8 text-gray-200 leading-relaxed text-justify">
+                <p>&emsp;&emsp;电动自行车事故频发，伤害严重。根据广州市主要医疗机构的数据，因电动自行车交通事故受伤的患者占创伤科 <span class="text-red-400 font-bold">六成以上</span>，部分医院甚至高达 <span class="text-red-400 font-bold">80%-90%</span>。</p>
+            </div>
+
+            <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-teal-600/30 shadow-lg">
+                <h4 class="text-xl font-semibold text-teal-200 mb-4">广州主要医院创伤骨科患者中涉电动车伤者占比 (%)</h4>
+                <div id="chart-injury-ratio" class="w-full h-96 bg-gray-900/40 rounded-lg"></div>
+                <p class="text-gray-400 text-sm mt-4">数据来源：多家主要医疗机构，展示电动车事故的严重性与集中度。</p>
+            </div>
+        </section>
+
+        <hr class="border-gray-700 my-10" />
+
+        <section>
+            <h3 class="text-2xl font-bold text-indigo-300 mb-6 flex items-center gap-3">
+                <span class="text-white text-3xl">❓</span> 第三章：系统性困境与治理体系
+            </h3>
+            
+            <div class="text-content space-y-4 mb-8 text-gray-200 leading-relaxed text-justify">
+                <p>&emsp;&emsp;广州市电动车之所以陷入混乱的困境，背后的原因有很多。通过梳理，我们归纳出三个主要原因：基础设计建设不足、车辆产销问题大、执法力量相对薄弱。</p>
+            </div>
+
+            <h4 class="text-2xl font-bold text-indigo-200 mb-4">3.1 基础设施：道路资源严重不足</h4>
+            <div class="text-content space-y-4 mb-8 text-gray-300 leading-relaxed text-justify">
+                <p>&emsp;&emsp;驾驶电动自行车在广州街头，你会发现行驶在非机动车道上是很困难的事。要么非机动车道窄到不足一米，要么干脆没有非机动车道。</p>
+                <p>&emsp;&emsp;根据建设部门的统计，广州现有的非机动车道中，仅有 <span class="text-red-400 font-bold">16%</span> 达到国家标准的2.5米宽度。这意味着 <span class="text-red-400 font-bold">84%</span> 的非机动车道都存在“先天不足”。更严重的是路网覆盖不足，截至2024年，广州的非机动车道覆盖率为 <span class="text-red-400 font-bold">72.3%</span>，仍有近三成的主次干路没有专门的非机动车道。</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-12">
+                <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-red-600/30 shadow-lg">
+                    <h5 class="text-xl font-semibold text-red-300 mb-4">非机动车道宽度达标率 (2.5米国标)</h5>
+                    <div id="chart-width-compliance" class="w-full h-64 bg-gray-900/40 rounded-lg"></div>
+                </div>
+                <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-teal-600/30 shadow-lg">
+                    <h5 class="text-xl font-semibold text-teal-300 mb-4">主次干路非机动车道网络覆盖率</h5>
+                    <div id="chart-network-coverage" class="w-full h-64 bg-gray-900/40 rounded-lg"></div>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-indigo-200 mb-4">3.2 车辆产销：非法改装与超速是常态</h4>
+            <div class="text-content space-y-4 mb-8 text-gray-300 leading-relaxed text-justify">
+                <p>&emsp;&emsp;除了道路问题，电动车非法改装也是一大安全隐患。目前，保守估计广州市有 <span class="text-red-400 font-bold">16%</span> 的电动车存在超标、非法改装的情况，改装后时速可突破 <span class="text-yellow-300 font-bold">60km/h</span>。据不完全统计，2024年广州市场上销售的“违规解码车”超过 <span class="text-red-400 font-bold">10万辆</span>。</p>
+                <p>&emsp;&emsp;市场调查显示，高达 <span class="text-red-400 font-bold">65%</span> 的市面车存在超标或违规解码的现象，提速、加装电池/鞍座、解锁限速是主要的违规形式，使得超速成为常态。</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-red-600/30 shadow-lg md:col-span-2">
+                    <h5 class="text-xl font-semibold text-red-300 mb-4">市面在售/流通车辆超标/违规比例</h5>
+                    <div id="chart-illegal-modification" class="w-full h-64 bg-gray-900/40 rounded-lg"></div>
+                </div>
+                <div class="p-6 glass-base liquid-card rounded-2xl text-center md:col-span-1 border border-red-600/30 flex flex-col justify-center">
+                    <div class="text-4xl font-bold text-yellow-300 mt-2 mb-2">>10 万辆</div>
+                    <p class="text-gray-300 text-sm">2024年销售的“违规解码车”总量（不完全统计）</p>
+                    <p class="text-gray-400 text-xs mt-3">主要违规形式：提速（超25km/h）、加装电池/鞍座、解锁限速</p>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-indigo-200 mb-4">3.3 执法与技术：管理难度高，技术亟待升级</h4>
+            <div class="text-content space-y-4 mb-8 text-gray-300 leading-relaxed text-justify">
+                <p>&emsp;&emsp;对电动车违法问题，广州交警显得“力不从心”。不仅人手不够，技术也落后，导致执法效果大打折扣。根据内部数据，全市日均查处电动自行车违法行为高达 <span class="text-red-400 font-bold">1.4 万起</span>，但相对于庞大的违法总量，查处率仅有 <span class="text-red-400 font-bold">0.05%</span>。</p>
+                <p>&emsp;&emsp;这一极低的查处率意味着，平均每 2000 起违法行为中仅有 1 起被查处。悬殊的数字不仅暴露了传统人力执法模式的局限性，更凸显了非现场执法技术（如智能抓拍、AI识别）亟待升级的紧迫性，否则难以形成有效震慑力。</p>
+            </div>
+            
+            <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-indigo-600/30 shadow-lg mb-8">
+                <h4 class="text-xl font-semibold text-indigo-200 mb-4">执法力量与违法总量的悬殊对比</h4>
+                <div id="chart-enforcement-gap" class="w-full h-80 bg-gray-900/40 rounded-lg"></div>
+                <p class="text-gray-400 text-sm mt-4">数据来源：全市日均查处 1.4 万起，查处率 0.05%。</p>
+            </div>
+        </section>
+
+        <hr class="border-gray-700 my-10" />
+
+        <section>
+            <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <span class="text-red-400 text-3xl">🛡️</span> 第四章：治理强化与成效初显
+            </h3>
+            
+            <div class="text-content space-y-4 mb-8 text-gray-300 leading-relaxed text-justify">
+                <p>&emsp;&emsp;近几年，社会上有关整治电动车乱象的声音越来越大。国家层面的政策主要由工业和信息化部、市场监管总局、公安部等部门制定，重点围绕安全技术规范、行业管理、过渡期安排、以旧换新补贴等。地方各地的政策则各不相同，重点围绕管理和执法两方面展开。</p>
+                <p>&emsp;&emsp;2025年12月1日，《电动自行车安全技术规范》（简称“新国标”）实施过渡期正式结束，符合新标准的电动自行车陆续进入市场流通环节。总的来看，新标准提升了电动自行车的安全性能，强化了非金属材料的防火阻燃要求，塑料件总质量不超过整车5.5%；制动性能显著提高，制动距离缩短一半；完善了电池组、控制器、限速器的防篡改要求，车速超25km/h电机自动断电。推行经营性车辆安装北斗定位，实现动态监测；不再强制安装脚踏板，鼓励安装后视镜和转向灯。</p>
+                <p>&emsp;&emsp;广州市自2024年底实施《广州市电动自行车管理规定》，明确限速、外卖车辆专用号牌及总量控制政策，新增电子抓拍设备并推进非机动车道改造。新规落地近一年，政府治理水平有所提高，取得了良好的效果。</p>
+            </div>
+
+            <h4 class="text-xl font-bold text-red-200 mt-6 mb-4">4.1 执法查处力度：总量与查扣双提升</h4>
+            <div class="text-content space-y-4 mb-8 text-gray-300 leading-relaxed text-justify">
+                <p>&emsp;&emsp;2025年，广州市针对电动自行车（俗称“电鸡”）治理开展了多项行动，重点解决非法改装、超速、违法行驶、违规停放充电等问题。治理由广州市公安局交警支队、市场监督管理局等多部门协同推进，坚持分类处理、宽严相济原则，实现柔性执法与严格监管平衡。截至 11 月，各类违法行为查处累计已达到 <span class="text-red-400 font-bold">43 万宗</span>，同期查扣车辆 <span class="text-yellow-300 font-bold">3.2 万辆</span>。</p>
+            </div>
+            <div class="grid grid-cols-2 gap-6 mb-10">
+                <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-red-600/30 shadow-lg">
+                    <h5 class="text-xl font-semibold text-red-200 mb-4">违法行为查处累计 (宗)</h5>
+                    <div id="chart-enforcement-progress" class="w-full h-40 bg-gray-900/40 rounded-lg"></div>
+                    <p class="text-gray-400 text-center mt-2 text-sm">截至 11 月累计已达 <span class="text-white font-bold">430,000 宗</span></p>
+                </div>
+                <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-yellow-600/30 shadow-lg">
+                    <h5 class="text-xl font-semibold text-yellow-200 mb-4">同期查扣车辆累计 (辆)</h5>
+                    <div id="chart-detention-progress" class="w-full h-40 bg-gray-900/40 rounded-lg"></div>
+                    <p class="text-gray-400 text-center mt-2 text-sm">同期查扣车辆累计 <span class="text-white font-bold">32,000 辆</span></p>
+                </div>
+            </div>
+
+            <h4 class="text-xl font-bold text-red-200 mt-6 mb-4">4.2 非法改装专项整治与教育劝导：从源头到行为</h4>
+            <div class="text-content space-y-4 mb-8 text-gray-300 leading-relaxed text-justify">
+                <p>&emsp;&emsp;针对源头改装问题，执法部门开展了专项整治，已查处个人改装行为 <span class="text-teal-300 font-bold">1458 人次</span>，并对其中 125 人采取行政拘留，对 40 人采取刑事措施。同时，查处违规店铺 <span class="text-teal-300 font-bold">1415 家次</span>，并查封了 5 个销售或改装黑点。在宣传教育方面，半月内通过路口沉浸式教育劝导了 <span class="text-teal-300 font-bold">7 万宗</span>违法行为，并开展了 150 余场安全宣讲。</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 mb-10">
+                <div class="p-6 liquid-card rounded-xl text-center border border-red-500/50 bg-gray-900/50 flex flex-col justify-center">
+                    <div class="text-xl font-bold text-red-300 mb-4">高压惩戒力度</div>
+                    <div class="text-3xl font-extrabold text-white mb-2">125 人</div>
+                    <div class="text-sm text-gray-400 mb-4">行政拘留</div>
+                    <div class="w-full h-px bg-gray-700 my-2"></div>
+                    <div class="text-2xl font-bold text-white mt-2">40 人</div>
+                    <div class="text-sm text-gray-400">刑事措施</div>
+                </div>
+                <div class="p-6 liquid-card rounded-xl text-center border border-yellow-500/50 bg-gray-900/50 flex flex-col justify-center">
+                    <div class="text-xl font-bold text-yellow-300 mb-4">源头治理与打击</div>
+                    <div class="text-3xl font-extrabold text-white mb-2">1415 家次</div>
+                    <div class="text-sm text-gray-400 mb-4">违规店铺查处</div>
+                    <div class="w-full h-px bg-gray-700 my-2"></div>
+                    <div class="text-2xl font-bold text-white mt-2">5 个</div>
+                    <div class="text-sm text-gray-400">查封黑点</div>
+                </div>
+                <div class="p-6 liquid-card rounded-xl text-center border border-teal-500/50 bg-gray-900/50 flex flex-col justify-center">
+                    <div class="text-xl font-bold text-teal-300 mb-4">宣传教育广度</div>
+                    <div class="text-3xl font-extrabold text-white mb-2">7 万宗</div>
+                    <div class="text-sm text-gray-400 mb-4">路口沉浸式劝导</div>
+                    <div class="w-full h-px bg-gray-700 my-2"></div>
+                    <div class="text-2xl font-bold text-white mt-2">150+ 场</div>
+                    <div class="text-sm text-gray-400">安全宣讲</div>
+                </div>
+            </div>
+
+            <h4 class="text-xl font-bold text-red-200 mt-6 mb-4">4.3 基础设施优化：共享车道与信号灯建设</h4>
+            <div class="text-content space-y-4 mb-8 text-gray-300 leading-relaxed text-justify">
+                <p>&emsp;&emsp;为保障骑行安全和路权，广州着力改善基础设施。目前已累计建设 <span class="text-indigo-300 font-bold">55.4 km</span> 的机动车与非机动车共享车道，覆盖 75 条重点路段。此外，为提升路口通行秩序，完成了 <span class="text-indigo-300 font-bold">372 个</span> 非机动车道信号灯的改造，以引导骑行者规范通行。</p>
+            </div>
+            
+            <div class="space-y-10">
+                <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-indigo-600/30 shadow-lg">
+                    <h5 class="text-xl font-semibold text-indigo-200 mb-4">电动车基础设施建设进展对比</h5>
+                    <div class="grid grid-cols-3 gap-6">
+                        <div id="chart-infrastructure-radar" class="col-span-2 w-full h-80 bg-gray-900/40 rounded-lg"></div>
+                        <div class="col-span-1 space-y-4 flex flex-col justify-center">
+                            <div class="p-4 bg-indigo-700/30 border border-indigo-500 rounded-lg text-center">
+                                <p class="text-3xl font-bold text-indigo-300">55.4 km</p>
+                                <p class="text-sm text-gray-300">共享车道累计建设里程</p>
+                            </div>
+                            <div class="p-4 bg-teal-700/30 border border-teal-500 rounded-lg text-center">
+                                <p class="text-3xl font-bold text-teal-300">372 个</p>
+                                <p class="text-sm text-gray-300">非机动车道信号灯改造</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-green-600/30 shadow-lg">
+                    <h5 class="text-xl font-semibold text-green-200 mb-4">非机动车道里程 (2021-2024)</h5>
+                    <div id="chart-mileage-bar" class="w-full h-80 bg-gray-900/40 rounded-lg"></div>
+                </div>
+            </div>
+
+        </section>
+
+        <hr class="border-gray-700 my-10" />
+
+        <section>
+            <h3 class="text-2xl font-bold text-white mt-10 mb-6">五、综合评估：治理体系初步成型</h3>
+
+            <div class="text-content space-y-4 mb-8 text-gray-300 leading-relaxed text-justify">
+                <p>&emsp;&emsp;从执法、基础设施到交通安全数据，广州的电动车治理已从“单点整治”走向“系统化管理”。共享车道体系、信号灯优化、查处力度叠加形成了城市级联治理成效。</p>
+                <p>&emsp;&emsp;当前挑战主要集中在：骑行需求持续上升、路面资源有限、非机动车与机动车仍共享部分通道等。治理需要继续从技术监控、数字化调度、算法优化骑行路径等方向推进。</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 所有图表初始化函数
+            const chartInitializers = {
+                'chart-daily-travel': initDailyTravelChart,
+                'chart-registration': initRegistrationChart,
+                'chart-enforcement-by-year': initEnforcementByYearChart,
+                'chart-injury-ratio': initInjuryRatioChart,
+                'chart-width-compliance': initWidthComplianceChart,
+                'chart-network-coverage': initNetworkCoverageChart,
+                'chart-illegal-modification': initIllegaModificationChart,
+                'chart-enforcement-gap': initEnforcementGapChart,
+                
+                // 第四章
+                'chart-enforcement-progress': initEnforcementProgressChart,
+                'chart-detention-progress': initDetentionProgressChart,
+                'chart-infrastructure-radar': initInfrastructureRadarChart,
+                'chart-mileage-bar': initMileageBarChart // 新增
+            };
+
+            // 检查元素是否在视口内才初始化图表，以节省资源并提升性能
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const chartId = entry.target.id;
+                        if (chartInitializers[chartId]) {
+                            chartInitializers[chartId]();
+                            delete chartInitializers[chartId]; // 初始化后取消监听
+                            observer.unobserve(entry.target);
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            // 监听所有图表容器
+            Object.keys(chartInitializers).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    observer.observe(element);
+                }
+            });
+
+            // --- ECharts 图表配置和数据 ---
+
+            // 1. 日均出行量对比
+            function initDailyTravelChart() {
+                var chartDom = document.getElementById('chart-daily-travel');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                var option = {
+                    tooltip: { trigger: 'axis' },
+                    legend: { data: ['电动自行车', '地铁', '公交'], textStyle: { color: '#ccc' } },
+                    xAxis: { type: 'category', boundaryGap: false, data: ['2021', '2022', '2023', '2024'], axisLabel: { color: '#ccc' } },
+                    yAxis: { type: 'value', name: '日均出行量 (万人次)', axisLabel: { formatter: '{value} 万', color: '#ccc' }, splitLine: { lineStyle: { color: '#444' } }, min: 0 },
+                    series: [
+                        { name: '电动自行车', type: 'line', data: [524, 600, 685, 903], smooth: true, itemStyle: { color: '#f87171' } }, 
+                        { name: '地铁', type: 'line', data: [776, 646, 857, 888], smooth: true, itemStyle: { color: '#60a5fa' } }, 
+                        { name: '公交', type: 'line', data: [900, 850, 800, 750], smooth: true, itemStyle: { color: '#34d399' } } 
+                    ]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+
+            // 2. 登记上牌数量 (更新数据：288, 442, 576, >600)
+            function initRegistrationChart() {
+                var chartDom = document.getElementById('chart-registration');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                var option = {
+                    tooltip: { trigger: 'axis', formatter: '{b}年: {c}万辆' },
+                    xAxis: { type: 'category', data: ['2022', '2023', '2024', '2025(预估)'], axisLabel: { color: '#ccc' } },
+                    yAxis: { type: 'value', name: '累计上牌数量 (万辆)', axisLabel: { formatter: '{value} 万', color: '#ccc' }, splitLine: { lineStyle: { color: '#444' } }, min: 0 },
+                    series: [{
+                        name: '累计上牌数量', type: 'bar', 
+                        data: [288, 442, 576, 620], // 更新为准确数据，2025取620作为>600的代表
+                        itemStyle: { color: '#fcd34d' },
+                        label: { show: true, position: 'top', formatter: '{c} 万', color: '#fff' }
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+
+            // 3. 交通违法查处量分年份对比
+            function initEnforcementByYearChart() {
+                var chartDom = document.getElementById('chart-enforcement-by-year');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+
+                const enforcementData = [
+                    { value: 112, name: '2021', tooltipLabel: '2021年: 112万宗 (官方公布)', labelText: '112万' },
+                    { value: 148, name: '2022', tooltipLabel: '2022年: 148万宗 (官方公布)', labelText: '148万' },
+                    { value: 160, name: '2023', tooltipLabel: '2023年: 未公布，总量超过100万宗', labelText: '>100万宗' },
+                    { value: 240, name: '2024', tooltipLabel: '2024年: 同比+174.5% (全年官方)', labelText: '同比增长+174.5%' },
+                    { value: 300, name: '2025', tooltipLabel: '2025年(预估): 自新规实施以来 +130%+ (整体同比)', labelText: '整体同比+130%+' }
+                ];
+                
+                const xAxisData = enforcementData.map(d => d.name);
+                const knownData = [
+                    { ...enforcementData[0], isLabel: true },
+                    { ...enforcementData[1], isLabel: true },
+                    { value: '-', name: '2023' }, 
+                    { value: '-', name: '2024' },
+                    { value: '-', name: '2025' }
+                ];
+                const trendData = [
+                    { value: '-', name: '2021' },
+                    { ...enforcementData[1], isLabel: false }, 
+                    { ...enforcementData[2], isLabel: true },
+                    { ...enforcementData[3], isLabel: true },
+                    { ...enforcementData[4], isLabel: true }
+                ];
+
+                var option = {
+                    tooltip: { 
+                        trigger: 'axis', 
+                        axisPointer: { type: 'line' }, 
+                        formatter: function(params) {
+                            const year = params[0].name;
+                            const dataItem = enforcementData.find(d => d.name === year);
+                            return dataItem ? dataItem.tooltipLabel : year;
+                        }
+                    },
+                    legend: { data: ['已知总量', '趋势估算'], textStyle: { color: '#ccc' } },
+                    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                    xAxis: { type: 'category', data: xAxisData, axisLabel: { color: '#ccc' } },
+                    yAxis: { type: 'value', name: '查处总量 (万宗)', axisLabel: { formatter: '{value} 万', color: '#ccc' }, splitLine: { lineStyle: { color: '#444' } }, min: 0 },
+                    series: [
+                        {
+                            name: '已知总量', type: 'line', data: knownData, symbol: 'circle', symbolSize: 10,
+                            lineStyle: { color: '#f87171', width: 3 }, itemStyle: { color: '#f87171' }, z: 2,
+                            label: { show: true, position: 'top', formatter: function(params) { return params.data.isLabel ? params.data.labelText : ''; }, textStyle: { color: '#fff', fontWeight: 'bold' } }
+                        },
+                        {
+                            name: '趋势估算', type: 'line', data: trendData, symbol: 'pin', symbolSize: 15,
+                            lineStyle: { color: '#fcd34d', type: 'dashed', width: 2 }, itemStyle: { color: '#fcd34d' }, z: 1,
+                            label: { show: true, position: 'bottom', formatter: function(params) { return params.data.isLabel ? params.data.labelText : ''; }, textStyle: { color: '#fcd34d', fontWeight: 'bold', fontSize: 13 } }
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+            
+            // 4. 交通事故受伤患者中电动车占比 (Tooltip 优化：仅显示范围)
+            function initInjuryRatioChart() {
+                var chartDom = document.getElementById('chart-injury-ratio');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                
+                const hospitals = ['南方医科大学第三附属医院', '中山大学孙逸仙纪念医院', '广东省第二人民医院', '南方医科大学珠江医院', '暨南大学附属第一医院'];
+                // 用于显示的柱状高度 (取范围平均值)
+                const data2122 = [60, 50, 60, 60, 50]; 
+                const data23 = [85, 65, 80, 75, 70]; 
+                const data24 = [85, 65, 80, 80, 80]; 
+
+                var option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { type: 'shadow' },
+                        formatter: function (params) {
+                            let str = params[0].name + '<br/>';
+                            params.forEach(item => {
+                                let originalRange = '';
+                                
+                                // 根据不同医院手动修正范围显示
+                                const hospitalIdx = item.dataIndex;
+                                if (hospitalIdx === 0) { // 南医三院
+                                     if(item.seriesName === '2021-2022') originalRange = '约50%-70%';
+                                     if(item.seriesName === '2023') originalRange = '80%-90%';
+                                     if(item.seriesName === '2024') originalRange = '80%-90%';
+                                } else if (hospitalIdx === 1) { // 孙逸仙
+                                     if(item.seriesName === '2021-2022') originalRange = '约40%-60%';
+                                     if(item.seriesName === '2023') originalRange = '>60%';
+                                     if(item.seriesName === '2024') originalRange = '>60%';
+                                } else if (hospitalIdx === 2) { // 省二医
+                                     if(item.seriesName === '2021-2022') originalRange = '约50%-70%';
+                                     if(item.seriesName === '2023') originalRange = '约80%';
+                                     if(item.seriesName === '2024') originalRange = '约80%';
+                                } else if (hospitalIdx === 3) { // 珠江
+                                     if(item.seriesName === '2021-2022') originalRange = '约50%-70%';
+                                     if(item.seriesName === '2023') originalRange = '约70%-80%';
+                                     if(item.seriesName === '2024') originalRange = '80%';
+                                } else if (hospitalIdx === 4) { // 暨南
+                                     if(item.seriesName === '2021-2022') originalRange = '约40%-60%';
+                                     if(item.seriesName === '2023') originalRange = '约60%-80%';
+                                     if(item.seriesName === '2024') originalRange = '>30%';
+                                }
+                                
+                                // 不显示精确比例，只显示范围文字
+                                str += `${item.marker} ${item.seriesName}: 数据范围: ${originalRange}<br/>`;
+                            });
+                            return str;
+                        }
+                    },
+                    legend: { data: ['2021-2022', '2023', '2024'], textStyle: { color: '#ccc' } },
+                    xAxis: { type: 'category', data: hospitals, axisLabel: { color: '#ccc', interval: 0, rotate: 20 } },
+                    yAxis: { type: 'value', name: '占比 (%)', axisLabel: { formatter: '{value} %', color: '#ccc' }, splitLine: { lineStyle: { color: '#444' } }, min: 0, max: 100 },
+                    series: [
+                        { name: '2021-2022', type: 'bar', data: data2122, itemStyle: { color: '#fcd34d' }, barGap: '0%' },
+                        { name: '2023', type: 'bar', data: data23, itemStyle: { color: '#f87171' } },
+                        { name: '2024', type: 'bar', data: data24, itemStyle: { color: '#60a5fa' } }
+                    ]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+
+            // 3.1 非机动车道宽度达标率 (16%)
+            function initWidthComplianceChart() {
+                var chartDom = document.getElementById('chart-width-compliance');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+
+                var option = {
+                    series: [{
+                        type: 'gauge',
+                        center: ['50%', '60%'],
+                        startAngle: 200,
+                        endAngle: -20,
+                        min: 0,
+                        max: 100,
+                        splitNumber: 4,
+                        itemStyle: { color: '#ef4444' },
+                        progress: { show: true, roundCap: true, width: 15 },
+                        pointer: { show: false },
+                        axisLine: { roundCap: true, lineStyle: { width: 15, color: [[0.16, '#ef4444'], [1, '#2c3e50']] } },
+                        axisTick: { show: false },
+                        splitLine: { show: false },
+                        axisLabel: { show: false },
+                        title: { show: false },
+                        detail: { valueAnimation: true, formatter: '{value}%', fontSize: 30, color: '#ef4444', offsetCenter: [0, '0%'] },
+                        data: [{ value: 16, name: '达标率' }]
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+
+            // 3.1 主次干路非机动车道网络覆盖率 (72.3%)
+            function initNetworkCoverageChart() {
+                var chartDom = document.getElementById('chart-network-coverage');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                var option = {
+                    series: [{
+                        type: 'gauge',
+                        center: ['50%', '60%'],
+                        startAngle: 200,
+                        endAngle: -20,
+                        min: 0,
+                        max: 100,
+                        splitNumber: 4,
+                        itemStyle: { color: '#34d399' },
+                        progress: { show: true, roundCap: true, width: 15 },
+                        pointer: { show: false },
+                        axisLine: { roundCap: true, lineStyle: { width: 15, color: [[0.723, '#34d399'], [1, '#2c3e50']] } },
+                        axisTick: { show: false },
+                        splitLine: { show: false },
+                        axisLabel: { show: false },
+                        title: { show: false },
+                        detail: { valueAnimation: true, formatter: '{value}%', fontSize: 30, color: '#34d399', offsetCenter: [0, '0%'] },
+                        data: [{ value: 72.3, name: '覆盖率' }]
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+            
+            // 3.2 非法改装与超标比例 (65%)
+            function initIllegaModificationChart() {
+                var chartDom = document.getElementById('chart-illegal-modification');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+
+                var data = [{ value: 65, name: '超标/非法改装车辆比例' }, { value: 35, name: '符合标准车辆比例' }];
+                var option = {
+                    title: {
+                        text: '65%',
+                        subtext: '市面车辆超标/违规比例',
+                        left: 'center',
+                        top: '35%',
+                        textStyle: { color: '#f87171', fontSize: 32, fontWeight: 'bold' },
+                        subtextStyle: { color: '#ccc', fontSize: 14 }
+                    },
+                    tooltip: { trigger: 'item', formatter: '{b}: {c}% ({d}%)' },
+                    legend: { orient: 'horizontal', bottom: 'bottom', data: ['超标/非法改装车辆比例', '符合标准车辆比例'], textStyle: { color: '#ccc' } },
+                    series: [{
+                        name: '车辆超标情况',
+                        type: 'pie',
+                        radius: ['50%', '70%'],
+                        center: ['50%', '50%'],
+                        avoidLabelOverlap: false,
+                        label: { show: false, position: 'center' },
+                        emphasis: { label: { show: true, fontSize: '20', fontWeight: 'bold' } },
+                        labelLine: { show: false },
+                        data: [
+                            { value: 65, name: '超标/非法改装车辆比例', itemStyle: { color: '#f87171' } },
+                            { value: 35, name: '符合标准车辆比例', itemStyle: { color: '#374151' } }
+                        ]
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+
+            // 3.3 执法力量与违法总量的悬殊对比 (0.05% 查处率)
+            function initEnforcementGapChart() {
+                var chartDom = document.getElementById('chart-enforcement-gap');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                var option = {
+                    title: {
+                        text: '0.05%',
+                        subtext: '日均违法行为查处率',
+                        left: 'center',
+                        top: '35%',
+                        textStyle: { color: '#60a5fa', fontSize: 36, fontWeight: 'bold' },
+                        subtextStyle: { color: '#ccc', fontSize: 14 }
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: function(params) {
+                            if (params.name === '已查处') { return `已查处行为: 约 1.4 万起<br/>查处率: ${params.percent}%`; }
+                            else { return `未查处行为: 占总量 ${params.percent}%<br/>执法技术盲区`; }
+                        }
+                    },
+                    series: [{
+                        name: '执法力量覆盖',
+                        type: 'pie',
+                        radius: ['50%', '70%'],
+                        center: ['50%', '50%'],
+                        avoidLabelOverlap: false,
+                        label: { show: true, position: 'outside', formatter: '{b}\n{d}%', color: '#ccc' },
+                        labelLine: { length: 10, length2: 5 },
+                        data: [
+                            { value: 0.05, name: '已查处', itemStyle: { color: '#60a5fa' } },
+                            { value: 99.95, name: '未被覆盖（技术盲区）', itemStyle: { color: '#ef4444' } } 
+                        ],
+                        emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+            
+            // 4.1.1 Chart: 违法行为查处累计 (43万宗)
+            function initEnforcementProgressChart() {
+                var chartDom = document.getElementById('chart-enforcement-progress');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                var option = {
+                    xAxis: { type: 'value', show: false, max: 50 },
+                    yAxis: { type: 'category', show: false, data: ['查处量'] },
+                    grid: { top: '0%', bottom: '0%', left: '0%', right: '0%' },
+                    series: [{
+                        type: 'bar',
+                        barWidth: '100%',
+                        showBackground: true,
+                        backgroundStyle: { color: 'rgba(255, 255, 255, 0.1)', borderRadius: 8 },
+                        itemStyle: { color: '#f87171', borderRadius: 8 },
+                        data: [43],
+                        label: { show: true, position: 'insideRight', formatter: '43 万宗', fontSize: 18, fontWeight: 'bold', color: '#fff', offset: [-10, 0] },
+                        animationDuration: 1500,
+                        animationEasing: 'cubicOut'
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+
+            // 4.1.2 Chart: 查扣车辆累计 (3.2万辆)
+            function initDetentionProgressChart() {
+                var chartDom = document.getElementById('chart-detention-progress');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                var option = {
+                    xAxis: { type: 'value', show: false, max: 4 },
+                    yAxis: { type: 'category', show: false, data: ['查扣量'] },
+                    grid: { top: '0%', bottom: '0%', left: '0%', right: '0%' },
+                    series: [{
+                        type: 'bar',
+                        barWidth: '100%',
+                        showBackground: true,
+                        backgroundStyle: { color: 'rgba(255, 255, 255, 0.1)', borderRadius: 8 },
+                        itemStyle: { color: '#fcd34d', borderRadius: 8 },
+                        data: [3.2],
+                        label: { show: true, position: 'insideRight', formatter: '3.2 万辆', fontSize: 18, fontWeight: 'bold', color: '#000', offset: [-10, 0] },
+                        animationDuration: 1500,
+                        animationEasing: 'cubicOut'
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+            
+            // 4.3 Chart A: 基础设施优化 (雷达图)
+            function initInfrastructureRadarChart() {
+                var chartDom = document.getElementById('chart-infrastructure-radar');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                var option = {
+                    tooltip: { trigger: 'item' },
+                    radar: {
+                        indicator: [
+                            { name: '共享车道里程 (km)', max: 80, color: '#f87171' },
+                            { name: '重点路段覆盖 (条)', max: 100, color: '#fcd34d' },
+                            { name: '信号灯改造 (个)', max: 500, color: '#60a5fa' }
+                        ],
+                        radius: '65%',
+                        name: { textStyle: { color: '#ccc', backgroundColor: '#333', borderRadius: 3, padding: [3, 5] } },
+                        splitArea: { areaStyle: { color: ['#2c3e50', '#34495e', '#2c3e50', '#34495e', '#2c3e50'] } },
+                        splitLine: { lineStyle: { color: '#444' } }
+                    },
+                    series: [{
+                        name: '基础设施建设进度',
+                        type: 'radar',
+                        data: [{
+                            value: [55.4, 75, 372],
+                            name: '当前累计成果',
+                            areaStyle: { opacity: 0.6, color: '#60a5fa' },
+                            lineStyle: { color: '#60a5fa' },
+                            symbolSize: 8,
+                            label: { show: true, formatter: function(params) { return params.value; }, color: '#fff', fontWeight: 'bold' }
+                        }]
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+            
+            // 【新增】 4.3 Chart B: 非机动车道里程柱状图 (2021-2024)
+            function initMileageBarChart() {
+                var chartDom = document.getElementById('chart-mileage-bar');
+                if (!chartDom) return;
+                var myChart = echarts.init(chartDom, 'dark');
+                
+                var option = {
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                    xAxis: { type: 'category', data: ['2021', '2022', '2023', '2024'], axisLabel: { color: '#ccc' } },
+                    yAxis: { type: 'value', name: '里程 (公里)', axisLabel: { formatter: '{value}', color: '#ccc' }, splitLine: { lineStyle: { color: '#444' } } },
+                    series: [{
+                        name: '非机动车道里程',
+                        type: 'bar',
+                        data: [1022.5, 1121.5, 1560.5, 1917.5],
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#10b981' }, // 绿色渐变
+                                { offset: 1, color: '#047857' }
+                            ])
+                        },
+                        label: { show: true, position: 'top', formatter: '{c}', color: '#fff' }
+                    }]
+                };
+                myChart.setOption(option);
+                window.addEventListener('resize', myChart.resize);
+            }
+        });
+    </script>
+</section>
+
+
+
+<!-- data -->
+<!-- data -->
+<!-- data -->
+
+
+
+
+<!-- VIDEO SECTION -->
+<section id="video-section" class="mt-20 report-section">
+    <h2 class="text-3xl font-bold mb-8 text-white flex items-center gap-3">
+        <span class="text-indigo-400">🎬</span> 核心视频：民声实录
+    </h2>
+
+    <div class="glass-base liquid-card rounded-3xl p-8 md:p-12 border border-white/10 shadow-2xl relative overflow-hidden">
+        
+        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-indigo-500 rounded-full blur-3xl opacity-20 pointer-events-none"></div>
+
+        <div class="mb-8 text-center md:text-left">
+            <h3 class="text-2xl md:text-3xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200 tracking-wide">
+                《广州：这是一座围城》
+            </h3>
+            <p class="text-gray-300 text-base leading-loose max-w-4xl text-justify">
+                本小组实地考察<span class="text-indigo-300 font-medium">广州市天河区石牌街道</span>的电动车交通情况，通过采访<span class="text-indigo-300 font-medium">外卖骑手、社区居民、大学生</span>，了解广州群众对电动车的真实想法。视频还通过对比分析，探讨<span class="text-indigo-300 font-medium">上海和深圳</span>关于电动车治理的先进经验。
+                <span class="text-gray-500 block mt-3 text-sm italic">（全片素材均来自小组成员拍摄或授权）</span>
+            </p>
+        </div>
+
+        <div class="relative group">
+            <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+            
+            <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black aspect-video">
+                <iframe 
+                    src="https://player.bilibili.com/player.html?bvid=BV1jPm4BHEGW&page=1&high_quality=1&danmaku=0" 
+                    scrolling="no" 
+                    border="0" 
+                    frameborder="0" 
+                    framespacing="0" 
+                    allowfullscreen="true"
+                    class="w-full h-full absolute inset-0"
+                ></iframe>
+            </div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-center md:justify-start gap-2 text-gray-400 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>建议在 Wi-Fi 环境下播放。</span>
+        </div>
+
+    </div>
+</section>
+  <section id="quiz" class="mt-20 mb-20 report-section">
+  <div class="max-w-5xl mx-auto px-4">
+    
+    <div class="text-center mb-10">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3 flex items-center justify-center gap-3">
+        <span class="animate-bounce">💬</span> 观点 PK 台
+      </h2>
+      <p class="text-gray-400">已有 <span id="total-votes" class="text-indigo-400 font-mono font-bold">12,583</span> 位市民参与了投票</p>
+    </div>
+
+    <div class="glass-base liquid-card p-8 rounded-3xl relative overflow-hidden">
+      
+      <h3 class="text-xl md:text-2xl font-bold text-center text-white mb-10 leading-relaxed">
+        面对广州“电鸡”围城，<br class="md:hidden" />你认为<span class="text-indigo-400 border-b-2 border-indigo-400">最急需解决</span>的痛点是？
+      </h3>
+
+      <div class="grid md:grid-cols-3 gap-6" id="vote-options">
+        
+        <button onclick="castVote(this, 'infra')" class="vote-card group relative flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-gray-800/40 hover:bg-gray-700/50 hover:border-indigo-500/50 transition-all duration-300 w-full">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform">🚧</div>
+          <div class="font-bold text-lg text-white mb-2">路权与规划</div>
+          <div class="text-sm text-gray-400 mb-4">路太窄，没地儿骑</div>
+          
+          <div class="progress-bar hidden w-full h-2 bg-gray-700 rounded-full mt-2 overflow-hidden">
+            <div class="h-full bg-indigo-500" style="width: 45%"></div>
+          </div>
+          <div class="percentage hidden mt-2 text-indigo-400 font-mono font-bold">45%</div>
+        </button>
+
+        <button onclick="castVote(this, 'behavior')" class="vote-card group relative flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-gray-800/40 hover:bg-gray-700/50 hover:border-pink-500/50 transition-all duration-300 w-full">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform">🛵</div>
+          <div class="font-bold text-lg text-white mb-2">素质与安全</div>
+          <div class="text-sm text-gray-400 mb-4">横冲直撞，太危险</div>
+
+          <div class="progress-bar hidden w-full h-2 bg-gray-700 rounded-full mt-2 overflow-hidden">
+            <div class="h-full bg-pink-500" style="width: 35%"></div>
+          </div>
+          <div class="percentage hidden mt-2 text-pink-400 font-mono font-bold">35%</div>
+        </button>
+
+        <button onclick="castVote(this, 'law')" class="vote-card group relative flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-gray-800/40 hover:bg-gray-700/50 hover:border-teal-500/50 transition-all duration-300 w-full">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform">⚖️</div>
+          <div class="font-bold text-lg text-white mb-2">执法与管理</div>
+          <div class="text-sm text-gray-400 mb-4">管得不严，标准乱</div>
+
+          <div class="progress-bar hidden w-full h-2 bg-gray-700 rounded-full mt-2 overflow-hidden">
+            <div class="h-full bg-teal-500" style="width: 20%"></div>
+          </div>
+          <div class="percentage hidden mt-2 text-teal-400 font-mono font-bold">20%</div>
+        </button>
+
+      </div>
+
+      <div id="vote-feedback" class="mt-8 text-center min-h-[60px] opacity-0 transition-opacity duration-500">
+        <p class="text-lg font-bold text-white" id="feedback-title"></p>
+        <p class="text-sm text-gray-400 mt-1" id="feedback-desc"></p>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let hasVoted = false;
+
+    function castVote(btn, type) {
+      if (hasVoted) return; // 防止重复投票
+      hasVoted = true;
+
+      // 1. 获取所有选项卡片
+      const allButtons = document.querySelectorAll('.vote-card');
+      const feedbackBox = document.getElementById('vote-feedback');
+      const feedbackTitle = document.getElementById('feedback-title');
+      const feedbackDesc = document.getElementById('feedback-desc');
+      const totalVotes = document.getElementById('total-votes');
+
+      // 2. 增加总票数动画
+      let currentVotes = 12583;
+      totalVotes.innerText = (currentVotes + 1).toLocaleString();
+
+      // 3. 处理每个按钮的状态
+      allButtons.forEach(button => {
+        // 禁用点击
+        button.classList.add('cursor-default', 'pointer-events-none');
+        
+        // 显示进度条和百分比
+        button.querySelector('.progress-bar').classList.remove('hidden');
+        button.querySelector('.percentage').classList.remove('hidden');
+
+        // 如果不是选中的按钮，降低透明度
+        if (button !== btn) {
+          button.classList.add('opacity-50', 'grayscale');
+        } else {
+          // 选中的按钮：高亮边框和背景
+          button.classList.remove('bg-gray-800/40', 'border-white/10');
+          button.classList.add('bg-gray-700', 'ring-2', 'ring-offset-2', 'ring-offset-gray-900');
+          
+          if(type === 'infra') button.classList.add('ring-indigo-500', 'border-indigo-500');
+          if(type === 'behavior') button.classList.add('ring-pink-500', 'border-pink-500');
+          if(type === 'law') button.classList.add('ring-teal-500', 'border-teal-500');
+        }
+      });
+
+      // 4. 显示反馈文案
+      feedbackBox.classList.remove('opacity-0');
+      
+      if (type === 'infra') {
+        feedbackTitle.innerText = "👍 英雄所见略同！";
+        feedbackTitle.className = "text-xl font-bold text-indigo-300 mb-1";
+        feedbackDesc.innerText = "数据表明，84%的非机动车道宽度不足，路权分配确实是“硬伤”。";
+      } else if (type === 'behavior') {
+        feedbackTitle.innerText = "🎯 一针见血！";
+        feedbackTitle.className = "text-xl font-bold text-pink-300 mb-1";
+        feedbackDesc.innerText = "安全意识淡薄是事故主因，教育与惩戒缺一不可。";
+      } else if (type === 'law') {
+        feedbackTitle.innerText = "👮‍♂️ 非常敏锐！";
+        feedbackTitle.className = "text-xl font-bold text-teal-300 mb-1";
+        feedbackDesc.innerText = "0.05%的极低查处率，说明技术升级和统一标准迫在眉睫。";
+      }
+    }
+  </script>
+</section>
+
+  <!-- MEMBERS SECTION -->
+  <section id="members" class="mt-20 report-section">
+      <h2 class="text-3xl font-bold mb-8 text-white flex items-center gap-3">
+          <span class="text-indigo-400">👥</span> 第32组小组成员与分工
+      </h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div class="p-6 glass-base liquid-card rounded-2xl group">
+              <div class="font-bold text-xl text-white group-hover:text-indigo-300">京若琛</div>
+              <div class="text-sm text-gray-400 mt-2">脚本及解说词 · 图表制作 · 采访</div>
+          </div>
+          <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -1s;">
+              <div class="font-bold text-xl text-white group-hover:text-indigo-300">车文恒</div>
+              <div class="text-sm text-gray-400 mt-2">摄影摄像 · 数据分析</div>
+          </div>
+          <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -2s;">
+              <div class="font-bold text-xl text-white group-hover:text-indigo-300">李盈</div>
+              <div class="text-sm text-gray-400 mt-2">剪辑 · 文案撰写</div>
+          </div>
+          <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -3s;">
+              <div class="font-bold text-xl text-white group-hover:text-indigo-300">李思欣</div>
+              <div class="text-sm text-gray-400 mt-2">剪辑 · 文案撰写</div>
+          </div>
+          <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -4s;">
+              <div class="font-bold text-xl text-white group-hover:text-indigo-300">王雅婕</div>
+              <div class="text-sm text-gray-400 mt-2">摄影 · 策划</div>
+          </div>
+          <div class="p-6 glass-base liquid-card rounded-2xl group" style="animation-delay: -5s;">
+              <div class="font-bold text-xl text-white group-hover:text-indigo-300">陈熙官</div>
+              <div class="text-sm text-gray-400 mt-2">图片拍摄 · 报告整理</div>
+          </div>
+      </div>
+  </section>
+
+</main>
 <footer class="dark-glass mt-12 border-t py-10 text-center text-gray-400 text-sm">
     <div class="container mx-auto px-4">
         <p class="mb-2 text-white font-medium">© 2025 第32组 · 融合新闻专题</p>
-        <p class="opacity-60 mb-4">广州市高校新闻实践 · Powered by Web Technology</p>
+        <p class="opacity-60 mb-4">广州市暨南大学融合新闻实践</p>
         
         <div class="flex justify-center items-center gap-6 text-xs opacity-50">
             <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
@@ -344,106 +1307,5 @@
         </div>
     </div>
   </footer>
-
-  <script>
-    // --- 1. Chart.js 图表配置 ---
-    Chart.defaults.color = '#cbd5e1';
-    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
-    Chart.defaults.font.family = "'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif";
-
-    // 图表1：违章对比 (柱状图)
-    const ctx1 = document.getElementById('violationChart').getContext('2d');
-    new Chart(ctx1, {
-      type: 'bar',
-      data: {
-        labels: ['闯红灯', '逆行', '未戴头盔', '违规载人', '走机动车道'],
-        datasets: [
-            {
-                label: '新规实施前（起）',
-                data: [65, 59, 80, 45, 70],
-                backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                borderRadius: 4
-            },
-            {
-                label: '新规实施后（起）',
-                data: [45, 40, 20, 30, 55],
-                backgroundColor: 'rgba(56, 189, 248, 0.7)',
-                borderRadius: 4
-            }
-        ]
-      },
-      options: { 
-        responsive:true, 
-        plugins:{
-            legend:{position:'bottom', labels: { boxWidth: 12 }},
-            tooltip: {
-                backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                titleColor: '#fff',
-                bodyColor: '#cbd5e1',
-                borderColor: 'rgba(255,255,255,0.2)',
-                borderWidth: 1,
-                padding: 10,
-            }
-        },
-        scales: { 
-            y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
-            x: { grid: { display: false } }
-        }
-      }
-    });
-
-    // 图表2：出行方式 (饼图)
-    const ctx2 = document.getElementById('transportChart').getContext('2d');
-    new Chart(ctx2, {
-      type: 'doughnut',
-      data: {
-        labels: ['电动自行车', '地铁/公交', '私家车', '步行/单车'],
-        datasets: [{
-            data: [45, 30, 15, 10],
-            backgroundColor: [
-                'rgba(99, 102, 241, 0.8)',
-                'rgba(56, 189, 248, 0.8)',
-                'rgba(255, 206, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)'
-            ],
-            borderColor: '#1e293b',
-            borderWidth: 2
-        }]
-      },
-      options: { 
-        responsive:true, 
-        plugins:{
-            legend:{position:'right', labels: { padding: 20 }},
-            tooltip: {
-                backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                titleColor: '#fff',
-                bodyColor: '#cbd5e1',
-                borderColor: 'rgba(255,255,255,0.2)',
-                borderWidth: 1,
-                padding: 10,
-            }
-        } 
-      }
-    });
-
-    // --- 2. 投票按钮交互 ---
-    document.querySelectorAll('.vote').forEach(btn=>{
-      btn.addEventListener('click', function() {
-          document.querySelectorAll('.vote').forEach(b => {
-              b.classList.remove('bg-indigo-600', 'border-indigo-400');
-              b.classList.add('border-white/30');
-          });
-          this.classList.remove('border-white/30');
-          this.classList.add('bg-indigo-600', 'border-indigo-400');
-          
-          const feedback = this.parentElement.nextElementSibling;
-          feedback.innerText = '✅ 投票成功！感谢您的参与。';
-          feedback.style.opacity = 0;
-          setTimeout(() => feedback.style.opacity = 1, 100);
-      })
-    });
-  </script>
-
 </body>
 </html>
-
