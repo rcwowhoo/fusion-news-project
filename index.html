@@ -446,7 +446,7 @@
             <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-teal-600/30 shadow-lg">
                 <h4 class="text-xl font-semibold text-teal-200 mb-4">广州主要医院创伤骨科患者中涉电动车伤者占比 (%)</h4>
                 <div id="chart-injury-ratio" class="w-full h-96 bg-gray-900/40 rounded-lg"></div>
-                <p class="text-gray-400 text-sm mt-4">数据来源：多家主要医疗机构，展示电动车事故的严重性与集中度。</p>
+                <p class="text-gray-400 text-sm mt-4">数据来源：整理自南方都市报的有关报道</p>
             </div>
         </section>
 
@@ -505,7 +505,7 @@
             <div class="visualization-container bg-gray-800/50 p-6 rounded-xl border border-indigo-600/30 shadow-lg mb-8">
                 <h4 class="text-xl font-semibold text-indigo-200 mb-4">执法力量与违法总量的悬殊对比</h4>
                 <div id="chart-enforcement-gap" class="w-full h-80 bg-gray-900/40 rounded-lg"></div>
-                <p class="text-gray-400 text-sm mt-4">数据来源：全市日均查处 1.4 万起，查处率 0.05%。</p>
+                <p class="text-gray-400 text-sm mt-4">数据来源：广州日报</p>
             </div>
         </section>
 
@@ -1129,16 +1129,14 @@
         </div>
 
     </div>
-</section>
-  <section id="quiz" class="mt-20 mb-20 report-section">
+<section id="quiz" class="mt-20 mb-20 report-section">
   <div class="max-w-5xl mx-auto px-4">
     
     <div class="text-center mb-10">
       <h2 class="text-3xl md:text-4xl font-bold text-white mb-3 flex items-center justify-center gap-3">
         <span class="animate-bounce">💬</span> 观点 PK 台
       </h2>
-      <p class="text-gray-400">已有 <span id="total-votes" class="text-indigo-400 font-mono font-bold">12,583</span> 位市民参与了投票</p>
-    </div>
+      </div>
 
     <div class="glass-base liquid-card p-8 rounded-3xl relative overflow-hidden">
       
@@ -1203,13 +1201,10 @@
       const feedbackBox = document.getElementById('vote-feedback');
       const feedbackTitle = document.getElementById('feedback-title');
       const feedbackDesc = document.getElementById('feedback-desc');
-      const totalVotes = document.getElementById('total-votes');
+      
+      // 已删除：获取 totalVotes 元素和数字增长动画的代码
 
-      // 2. 增加总票数动画
-      let currentVotes = 12583;
-      totalVotes.innerText = (currentVotes + 1).toLocaleString();
-
-      // 3. 处理每个按钮的状态
+      // 2. 处理每个按钮的状态
       allButtons.forEach(button => {
         // 禁用点击
         button.classList.add('cursor-default', 'pointer-events-none');
@@ -1232,7 +1227,7 @@
         }
       });
 
-      // 4. 显示反馈文案
+      // 3. 显示反馈文案
       feedbackBox.classList.remove('opacity-0');
       
       if (type === 'infra') {
@@ -1308,6 +1303,7 @@
   </footer>
 </body>
 </html>
+
 
 
 
